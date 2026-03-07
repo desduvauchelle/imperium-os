@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen, waitFor, fireEvent } from '@testing-library/react'
 import { App } from '../src/renderer/App.js'
-import type { OnboardingCheckResponse } from '@imperium/shared-types'
+import type { OnboardingCheckResponse, PermissionsProfileResponse } from '@imperium/shared-types'
 
 // Mock electronApi so the onboarding screen completes
 const allInstalledResponse: OnboardingCheckResponse = {
@@ -12,9 +12,24 @@ const allInstalledResponse: OnboardingCheckResponse = {
   allRequiredInstalled: true,
 }
 
+const mockProfile: PermissionsProfileResponse = {
+  level: 'praetorian',
+  label: 'Praetorian',
+  description: 'Balanced safeguarding.',
+  permissions: {
+    'file-read': 'allow',
+    'file-write': 'allow',
+    'file-delete': 'prompt',
+    'system-modify': 'deny',
+  },
+}
+
 beforeEach(() => {
   window.electronApi = {
-    invoke: vi.fn().mockResolvedValue(allInstalledResponse),
+    invoke: vi.fn().mockImplementation((channel: string) => {
+      if (channel === 'permissions:get-profile') return Promise.resolve(mockProfile)
+      return Promise.resolve(allInstalledResponse)
+    }),
     on: vi.fn().mockReturnValue(() => {}),
   } as unknown as typeof window.electronApi
 })
@@ -35,7 +50,7 @@ describe('App', () => {
     fireEvent.click(screen.getByTestId('continue-btn'))
     await waitFor(() => {
       expect(screen.getByText('Imperium OS')).toBeInTheDocument()
-      expect(screen.getByText(/Phase 2/)).toBeInTheDocument()
+      expect(screen.getByText(/Phase 3/)).toBeInTheDocument()
     })
   })
 

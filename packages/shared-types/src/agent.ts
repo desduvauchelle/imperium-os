@@ -1,4 +1,5 @@
 import type { AgentId, MemoryBlockId, MessageId, ProjectId, Timestamp } from './brand.js'
+import type { ActionCategory } from './comfort-level.js'
 
 // ============================================================================
 // Agent Types
@@ -42,6 +43,22 @@ export interface AgentContext {
 	readonly messageHistory: readonly MessageId[]
 	readonly fileTreeDepth: number
 	readonly memoryBlockIds: readonly MemoryBlockId[]
+}
+
+/** Context describing why an agent was suspended */
+export interface SuspensionContext {
+	readonly action: ActionCategory
+	readonly reason: string
+	readonly pendingToolCall?: string | undefined
+}
+
+/** Agent state transition event */
+export interface AgentStateTransition {
+	readonly agentId: AgentId
+	readonly from: AgentState
+	readonly to: AgentState
+	readonly timestamp: Timestamp
+	readonly suspension?: SuspensionContext | undefined
 }
 
 /** Serializable agent state for persistence */

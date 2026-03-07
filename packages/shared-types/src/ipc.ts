@@ -20,6 +20,10 @@ export type IpcChannel =
 	| 'system:quit'
 	| 'onboarding:check'
 	| 'onboarding:install'
+	| 'permissions:get-profile'
+	| 'permissions:set-level'
+	| 'permissions:evaluate'
+	| 'agent:resume'
 
 /** IPC message envelope */
 export interface IpcMessage<T = unknown> {
@@ -56,6 +60,26 @@ export interface IpcHandlerMap {
 	'system:quit': { request: void; response: void }
 	'onboarding:check': { request: void; response: OnboardingCheckResponse }
 	'onboarding:install': { request: { name: string }; response: { success: boolean; error?: string } }
+	'permissions:get-profile': { request: void; response: PermissionsProfileResponse }
+	'permissions:set-level': { request: { level: string }; response: void }
+	'permissions:evaluate': { request: { action: string }; response: PermissionsEvaluateResponse }
+	'agent:resume': { request: { agentId: string; approved: boolean }; response: void }
+}
+
+/** Shape of permissions profile response */
+export interface PermissionsProfileResponse {
+	readonly level: string
+	readonly label: string
+	readonly description: string
+	readonly permissions: Readonly<Record<string, string>>
+}
+
+/** Shape of permission evaluation response */
+export interface PermissionsEvaluateResponse {
+	readonly action: string
+	readonly verdict: string
+	readonly comfortLevel: string
+	readonly reason: string
 }
 
 /** Shape of the onboarding check response sent over IPC */

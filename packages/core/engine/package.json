@@ -19,9 +19,12 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@imperium/shared-types": "workspace:*"
+    "@imperium/shared-types": "workspace:*",
+    "@imperium/core-llm": "workspace:*",
+    "@imperium/core-permissions": "workspace:*"
   },
   "devDependencies": {
-    "typescript": "^5.7.0"
+    "typescript": "^5.7.0",
+    "bun-types": "^1.1.29"
   }
 }

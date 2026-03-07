@@ -45,7 +45,14 @@ export type { ProjectStatus, ProjectMetadata, ProjectConfig, Project } from './p
 export { PROJECT_STATUSES, isProjectStatus } from './project.js'
 
 // Agent
-export type { AgentState, AgentTask, AgentContext, AgentSnapshot } from './agent.js'
+export type {
+	AgentState,
+	AgentTask,
+	AgentContext,
+	AgentSnapshot,
+	SuspensionContext,
+	AgentStateTransition,
+} from './agent.js'
 export { AGENT_STATES, isAgentState } from './agent.js'
 
 // Memory
@@ -106,6 +113,8 @@ export type {
 	IpcResponse,
 	IpcHandlerMap,
 	OnboardingCheckResponse,
+	PermissionsProfileResponse,
+	PermissionsEvaluateResponse,
 } from './ipc.js'
 
 // LLM

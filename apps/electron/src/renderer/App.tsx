@@ -3,6 +3,8 @@ import { ThemeProvider, Button, CostTag, Card, CardHeader, CardTitle, CardDescri
 import type { ThemeMode } from '@imperium/shared-types'
 import { useTheme } from '@imperium/ui-shared'
 import { OnboardingScreen } from './screens/OnboardingScreen.js'
+import { PermissionsPanel } from './panels/PermissionsPanel.js'
+import { CaffeinateToggle } from './panels/CaffeinateToggle.js'
 
 // ============================================================================
 // Theme Toggle - Demonstrates Light/Dark/Auto switching
@@ -72,11 +74,17 @@ export function App() {
               {/* Status */}
               <div className="pt-4 border-t">
                 <p className="text-sm text-muted-foreground">
-                  Phase 2 Core & Context • All systems nominal
+                  Phase 3 Permissions & OS Logic • All systems nominal
                 </p>
               </div>
             </CardContent>
           </Card>
+
+          {/* Permissions Panel */}
+          <PermissionsPanel />
+
+          {/* Power Management */}
+          <CaffeinateToggle />
         </div>
       </div>
     </ThemeProvider>
