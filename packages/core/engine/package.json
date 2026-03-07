@@ -21,7 +21,8 @@
   "dependencies": {
     "@imperium/shared-types": "workspace:*",
     "@imperium/core-llm": "workspace:*",
-    "@imperium/core-permissions": "workspace:*"
+    "@imperium/core-permissions": "workspace:*",
+    "@imperium/mcp-registry": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.7.0",

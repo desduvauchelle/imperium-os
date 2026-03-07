@@ -82,6 +82,14 @@ export type {
 	McpToolCall,
 	McpToolResult,
 	McpPermission,
+	FileLockEntry,
+	FileLockStatus,
+	DiscordConfig,
+	TelegramConfig,
+	WhatsAppConfig,
+	EmailConfig,
+	CommConfig,
+	McpServerSummary,
 } from './mcp.js'
 export { isMcpServer } from './mcp.js'
 
@@ -91,8 +99,21 @@ export type {
 	TaskPriority,
 	TaskComment,
 	KanbanTask,
+	KanbanBoardState,
+	TaskFilter,
+	TaskPatch,
 } from './task.js'
 export { TASK_STATUSES, isTaskStatus } from './task.js'
+
+// Tailscale
+export type {
+	TailscalePeerStatus,
+	TailscaleBackendState,
+	TailscalePeer,
+	TailscaleSelf,
+	TailscaleStatus,
+} from './tailscale.js'
+export { TAILSCALE_PEER_STATUSES, isTailscalePeerStatus } from './tailscale.js'
 
 // User & Auth
 export type { AuthProvider, User, AuthSession } from './user.js'
@@ -115,6 +136,21 @@ export type {
 	OnboardingCheckResponse,
 	PermissionsProfileResponse,
 	PermissionsEvaluateResponse,
+	McpListServersResponse,
+	McpGetLocksResponse,
+	KanbanListTasksRequest,
+	KanbanListTasksResponse,
+	KanbanCreateTaskRequest,
+	KanbanCreateTaskResponse,
+	KanbanUpdateTaskRequest,
+	KanbanAddCommentRequest,
+	KanbanGetBoardResponse,
+	CostingGetSummaryRequest,
+	CostingGetSummaryResponse,
+	CostingGetEntriesRequest,
+	CostingGetEntriesResponse,
+	TailscaleStatusResponse,
+	TailscaleUpDownResponse,
 } from './ipc.js'
 
 // LLM

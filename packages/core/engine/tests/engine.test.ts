@@ -313,14 +313,14 @@ describe('Engine', () => {
     expect(calls).toHaveLength(0)
   })
 
-  test('executeToolCall returns stub result', () => {
+  test('executeToolCall returns stub result', async () => {
     const engine = new Engine()
     const toolCall: ParsedToolCall = {
       name: 'read_file',
       arguments: { path: 'test.ts' },
       actionCategory: 'file-read',
     }
-    const result = engine.executeToolCall(toolCall)
+    const result = await engine.executeToolCall(toolCall)
     expect(result.success).toBe(true)
     expect(result.toolName).toBe('read_file')
     expect(result.output).toContain('[stub]')

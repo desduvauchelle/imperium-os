@@ -46,3 +46,31 @@ export interface KanbanTask {
   readonly createdAt: Timestamp
   readonly updatedAt: Timestamp
 }
+
+// ============================================================================
+// Kanban Board State & Filtering
+// ============================================================================
+
+/** Kanban board state — tasks grouped by status column */
+export interface KanbanBoardState {
+  readonly columns: Readonly<Record<TaskStatus, readonly KanbanTask[]>>
+  readonly taskCount: number
+}
+
+/** Filter criteria for the Kanban board */
+export interface TaskFilter {
+  readonly status?: TaskStatus | undefined
+  readonly priority?: TaskPriority | undefined
+  readonly assignee?: UserId | 'agent' | undefined
+  readonly projectId?: ProjectId | undefined
+  readonly search?: string | undefined
+}
+
+/** Partial update to a task — any mutable fields */
+export interface TaskPatch {
+  readonly title?: string | undefined
+  readonly description?: string | undefined
+  readonly status?: TaskStatus | undefined
+  readonly priority?: TaskPriority | undefined
+  readonly assignee?: UserId | 'agent' | undefined
+}

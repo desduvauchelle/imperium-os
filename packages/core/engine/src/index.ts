@@ -5,12 +5,14 @@ import type {
   ActionCategory,
   LlmMessage,
   LlmProvider,
+  McpToolCall,
   Result,
   SuspensionContext,
 } from '@imperium/shared-types'
 import { ok, err, isOk, createAgentId, createTimestamp } from '@imperium/shared-types'
 import { AgentStateMachine } from './state-machine.js'
 import type { PermissionGuard, PermissionResult } from '@imperium/core-permissions'
+import type { McpRegistry } from '@imperium/mcp-registry'
 
 // ============================================================================
 // Engine Configuration
@@ -79,16 +81,19 @@ export class Engine {
   readonly config: EngineConfig
   private readonly llm: LlmProvider | null
   private readonly guard: PermissionGuard | null
+  private readonly registry: McpRegistry | null
   private readonly stateMachines = new Map<string, AgentStateMachine>()
 
   constructor(
     config: Partial<EngineConfig> = {},
     llm?: LlmProvider,
     guard?: PermissionGuard,
+    registry?: McpRegistry,
   ) {
     this.config = { ...DEFAULT_ENGINE_CONFIG, ...config }
     this.llm = llm ?? null
     this.guard = guard ?? null
+    this.registry = registry ?? null
   }
 
   /** Get or create a state machine for an agent */
@@ -243,9 +248,30 @@ export class Engine {
   }
 
   /**
-   * Execute a tool call (stub for Phase 3 — real MCP dispatch in Phase 4).
+   * Execute a tool call via McpRegistry dispatch or fallback stub.
    */
-  executeToolCall(toolCall: ParsedToolCall): ToolExecutionResult {
+  async executeToolCall(toolCall: ParsedToolCall): Promise<ToolExecutionResult> {
+    if (this.registry) {
+      const result = await this.registry.dispatchByToolName(
+        toolCall.name,
+        toolCall.arguments,
+        `engine-${Date.now()}`,
+      )
+      if (result.ok) {
+        return {
+          toolName: toolCall.name,
+          output: result.value.success
+            ? JSON.stringify(result.value.data ?? '')
+            : (result.value.error ?? 'Unknown error'),
+          success: result.value.success,
+        }
+      }
+      return {
+        toolName: toolCall.name,
+        output: result.error.message,
+        success: false,
+      }
+    }
     return {
       toolName: toolCall.name,
       output: `[stub] Tool '${toolCall.name}' executed with args: ${JSON.stringify(toolCall.arguments)}`,

@@ -13,6 +13,13 @@ import { createTimestamp } from '@imperium/shared-types'
 // Cost Tracker - Usage tracking & pricing engine
 // ============================================================================
 
+/** Injectable persistence interface — optional SQLite backing */
+export interface CostPersistence {
+  insert(id: string, entry: CostEntry): Promise<void>
+  getAll(limit?: number, offset?: number): Promise<readonly CostEntry[]>
+  count(): Promise<number>
+}
+
 export interface CostTrackerConfig {
   readonly currency: string
   readonly defaultRateLimits: readonly RateLimit[]
@@ -26,19 +33,36 @@ export const DEFAULT_COST_CONFIG: CostTrackerConfig = {
 export class CostTracker {
   readonly config: CostTrackerConfig
   private readonly _entries: CostEntry[] = []
+  private readonly _persistence: CostPersistence | null
 
-  constructor(config: Partial<CostTrackerConfig> = {}) {
+  constructor(config: Partial<CostTrackerConfig> = {}, persistence?: CostPersistence) {
     this.config = { ...DEFAULT_COST_CONFIG, ...config }
+    this._persistence = persistence ?? null
   }
 
-  /** Record a new cost entry */
-  record(entry: CostEntry): void {
+  /** Record a new cost entry (in-memory + optional persistence) */
+  async record(entry: CostEntry): Promise<void> {
     this._entries.push(entry)
+    if (this._persistence) {
+      await this._persistence.insert(crypto.randomUUID(), entry)
+    }
   }
 
-  /** Get all recorded entries */
+  /** Get all recorded entries (in-memory) */
   getEntries(): readonly CostEntry[] {
     return this._entries
+  }
+
+  /** Get persisted entries from the database (if available) */
+  async getPersistedEntries(limit?: number, offset?: number): Promise<readonly CostEntry[]> {
+    if (!this._persistence) return this._entries
+    return this._persistence.getAll(limit, offset)
+  }
+
+  /** Count persisted entries */
+  async getPersistedCount(): Promise<number> {
+    if (!this._persistence) return this._entries.length
+    return this._persistence.count()
   }
 
   /** Get usage summary for the current period */

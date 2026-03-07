@@ -3,7 +3,17 @@ import { render, screen, waitFor, fireEvent } from '@testing-library/react'
 import { PermissionsPanel } from '../src/renderer/panels/PermissionsPanel.js'
 import { SuspendedAgentBanner } from '../src/renderer/panels/SuspendedAgentBanner.js'
 import { CaffeinateToggle } from '../src/renderer/panels/CaffeinateToggle.js'
-import type { PermissionsProfileResponse, SuspensionContext } from '@imperium/shared-types'
+import { KanbanPanel } from '../src/renderer/panels/KanbanPanel.js'
+import { CostingDashboard } from '../src/renderer/panels/CostingDashboard.js'
+import { TailscalePanel } from '../src/renderer/panels/TailscalePanel.js'
+import type {
+	PermissionsProfileResponse,
+	SuspensionContext,
+	KanbanGetBoardResponse,
+	CostingGetSummaryResponse,
+	CostingGetEntriesResponse,
+	TailscaleStatusResponse,
+} from '@imperium/shared-types'
 
 // ============================================================================
 // Mock data
@@ -201,6 +211,230 @@ describe('CaffeinateToggle', () => {
 		await waitFor(() => {
 			expect(invoke).toHaveBeenCalledWith('system:power-mode', { enabled: false })
 			expect(screen.getByTestId('caffeinate-btn')).toHaveTextContent('Off')
+		})
+	})
+})
+
+// ============================================================================
+// Mock data for Phase 5 panels
+// ============================================================================
+
+const mockBoard: KanbanGetBoardResponse = {
+	columns: {
+		'todo': [
+			{ id: 't1', title: 'Task 1', status: 'todo', priority: 'high', commentCount: 2 },
+			{ id: 't2', title: 'Task 2', status: 'todo', priority: 'low', commentCount: 0 },
+		],
+		'in-progress': [
+			{ id: 't3', title: 'Task 3', status: 'in-progress', priority: 'medium', commentCount: 1 },
+		],
+		'review': [],
+		'done': [
+			{ id: 't4', title: 'Task 4', status: 'done', priority: 'medium', commentCount: 0 },
+		],
+	},
+	taskCount: 4,
+}
+
+const mockCostSummary: CostingGetSummaryResponse = {
+	totalCostUsd: 1.5,
+	totalInputTokens: 50000,
+	totalOutputTokens: 20000,
+	entriesByModel: {
+		'claude-3.5-sonnet': {
+			model: 'claude-3.5-sonnet',
+			provider: 'anthropic',
+			totalCostUsd: 1.2,
+			totalInputTokens: 40000,
+			totalOutputTokens: 15000,
+			callCount: 5,
+		},
+		'gpt-4': {
+			model: 'gpt-4',
+			provider: 'openai',
+			totalCostUsd: 0.3,
+			totalInputTokens: 10000,
+			totalOutputTokens: 5000,
+			callCount: 2,
+		},
+	},
+	periodStart: '2026-01-01T00:00:00.000Z',
+	periodEnd: '2026-03-07T00:00:00.000Z',
+}
+
+const mockCostEntries: CostingGetEntriesResponse = {
+	entries: [
+		{ model: 'claude-3.5-sonnet', provider: 'anthropic', inputTokens: 1000, outputTokens: 500, costUsd: 0.002, timestamp: '2026-03-07T00:00:00.000Z' },
+	],
+	total: 1,
+}
+
+const mockTailscaleStatus: TailscaleStatusResponse = {
+	backendState: 'Running',
+	selfHostname: 'imperium-master',
+	selfIp: '100.64.0.1',
+	tailnet: 'example.ts.net',
+	peers: [
+		{ id: 'p1', hostname: 'satellite-1', ipv4: '100.64.0.2', online: true, os: 'macOS' },
+		{ id: 'p2', hostname: 'satellite-2', ipv4: '100.64.0.3', online: false, os: 'linux' },
+	],
+	version: '1.56.0',
+}
+
+// ============================================================================
+// KanbanPanel tests
+// ============================================================================
+
+describe('KanbanPanel', () => {
+	it('shows loading state initially', () => {
+		const invoke = vi.fn().mockImplementation(() => new Promise(() => {}))
+		render(<KanbanPanel projectId="proj-1" invoke={invoke} />)
+		expect(screen.getByTestId('kanban-loading')).toBeInTheDocument()
+	})
+
+	it('displays board after loading', async () => {
+		const invoke = vi.fn().mockResolvedValue(mockBoard)
+		render(<KanbanPanel projectId="proj-1" invoke={invoke} />)
+		await waitFor(() => {
+			expect(screen.getByTestId('kanban-panel')).toBeInTheDocument()
+			expect(screen.getByText('4 task(s)')).toBeInTheDocument()
+		})
+	})
+
+	it('renders all four columns', async () => {
+		const invoke = vi.fn().mockResolvedValue(mockBoard)
+		render(<KanbanPanel projectId="proj-1" invoke={invoke} />)
+		await waitFor(() => {
+			expect(screen.getByTestId('kanban-column-todo')).toBeInTheDocument()
+			expect(screen.getByTestId('kanban-column-in-progress')).toBeInTheDocument()
+			expect(screen.getByTestId('kanban-column-review')).toBeInTheDocument()
+			expect(screen.getByTestId('kanban-column-done')).toBeInTheDocument()
+		})
+	})
+
+	it('renders task cards', async () => {
+		const invoke = vi.fn().mockResolvedValue(mockBoard)
+		render(<KanbanPanel projectId="proj-1" invoke={invoke} />)
+		await waitFor(() => {
+			expect(screen.getByTestId('kanban-card-t1')).toBeInTheDocument()
+			expect(screen.getByTestId('kanban-card-t3')).toBeInTheDocument()
+		})
+	})
+})
+
+// ============================================================================
+// CostingDashboard tests
+// ============================================================================
+
+describe('CostingDashboard', () => {
+	it('shows loading state initially', () => {
+		const invoke = vi.fn().mockImplementation(() => new Promise(() => {}))
+		render(<CostingDashboard invoke={invoke} />)
+		expect(screen.getByTestId('costing-loading')).toBeInTheDocument()
+	})
+
+	it('displays summary after loading', async () => {
+		const invoke = vi.fn().mockImplementation((channel: string) => {
+			if (channel === 'costing:get-summary') return Promise.resolve(mockCostSummary)
+			if (channel === 'costing:get-entries') return Promise.resolve(mockCostEntries)
+			return Promise.resolve(undefined)
+		})
+		render(<CostingDashboard invoke={invoke} budgetLimit={5} />)
+		await waitFor(() => {
+			expect(screen.getByTestId('costing-dashboard')).toBeInTheDocument()
+			expect(screen.getByTestId('spend-bar')).toBeInTheDocument()
+		})
+	})
+
+	it('shows model breakdown', async () => {
+		const invoke = vi.fn().mockImplementation((channel: string) => {
+			if (channel === 'costing:get-summary') return Promise.resolve(mockCostSummary)
+			if (channel === 'costing:get-entries') return Promise.resolve(mockCostEntries)
+			return Promise.resolve(undefined)
+		})
+		render(<CostingDashboard invoke={invoke} />)
+		await waitFor(() => {
+			expect(screen.getByTestId('costing-by-model')).toBeInTheDocument()
+			expect(screen.getByTestId('cost-model-claude-3.5-sonnet')).toBeInTheDocument()
+			expect(screen.getByTestId('cost-model-gpt-4')).toBeInTheDocument()
+		})
+	})
+
+	it('shows recent entries', async () => {
+		const invoke = vi.fn().mockImplementation((channel: string) => {
+			if (channel === 'costing:get-summary') return Promise.resolve(mockCostSummary)
+			if (channel === 'costing:get-entries') return Promise.resolve(mockCostEntries)
+			return Promise.resolve(undefined)
+		})
+		render(<CostingDashboard invoke={invoke} />)
+		await waitFor(() => {
+			expect(screen.getByTestId('costing-recent')).toBeInTheDocument()
+			expect(screen.getByTestId('cost-entry-0')).toBeInTheDocument()
+		})
+	})
+})
+
+// ============================================================================
+// TailscalePanel tests
+// ============================================================================
+
+describe('TailscalePanel', () => {
+	it('shows loading state initially', () => {
+		const invoke = vi.fn().mockImplementation(() => new Promise(() => {}))
+		render(<TailscalePanel invoke={invoke} />)
+		expect(screen.getByTestId('tailscale-loading')).toBeInTheDocument()
+	})
+
+	it('displays status after loading', async () => {
+		const invoke = vi.fn().mockResolvedValue(mockTailscaleStatus)
+		render(<TailscalePanel invoke={invoke} />)
+		await waitFor(() => {
+			expect(screen.getByTestId('tailscale-panel')).toBeInTheDocument()
+			expect(screen.getByTestId('tailscale-state')).toHaveTextContent('Running')
+		})
+	})
+
+	it('shows peers table', async () => {
+		const invoke = vi.fn().mockResolvedValue(mockTailscaleStatus)
+		render(<TailscalePanel invoke={invoke} />)
+		await waitFor(() => {
+			expect(screen.getByTestId('tailscale-peers-table')).toBeInTheDocument()
+			expect(screen.getByTestId('peer-p1')).toBeInTheDocument()
+			expect(screen.getByTestId('peer-p2')).toBeInTheDocument()
+		})
+	})
+
+	it('shows disconnect button when running', async () => {
+		const invoke = vi.fn().mockResolvedValue(mockTailscaleStatus)
+		render(<TailscalePanel invoke={invoke} />)
+		await waitFor(() => {
+			expect(screen.getByTestId('tailscale-down-btn')).toBeInTheDocument()
+		})
+	})
+
+	it('shows connect button when stopped', async () => {
+		const stoppedStatus: TailscaleStatusResponse = {
+			...mockTailscaleStatus,
+			backendState: 'Stopped',
+			peers: [],
+		}
+		const invoke = vi.fn().mockResolvedValue(stoppedStatus)
+		render(<TailscalePanel invoke={invoke} />)
+		await waitFor(() => {
+			expect(screen.getByTestId('tailscale-up-btn')).toBeInTheDocument()
+			expect(screen.getByTestId('no-peers')).toBeInTheDocument()
+		})
+	})
+
+	it('calls tailscale:down on disconnect click', async () => {
+		const invoke = vi.fn().mockResolvedValue(mockTailscaleStatus)
+		render(<TailscalePanel invoke={invoke} />)
+		await waitFor(() => {
+			expect(screen.getByTestId('tailscale-down-btn')).toBeInTheDocument()
+		})
+		fireEvent.click(screen.getByTestId('tailscale-down-btn'))
+		await waitFor(() => {
+			expect(invoke).toHaveBeenCalledWith('tailscale:down', undefined)
 		})
 	})
 })

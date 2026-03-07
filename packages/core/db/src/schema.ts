@@ -43,3 +43,45 @@ export const projects = sqliteTable('projects', {
   createdAt: text('created_at').notNull(),
   updatedAt: text('updated_at').notNull(),
 })
+
+// ============================================================================
+// Phase 5 — Kanban Tasks
+// ============================================================================
+
+/** Tasks table — Kanban board task cards */
+export const tasks = sqliteTable('tasks', {
+  id: text('id').primaryKey(),
+  projectId: text('project_id').notNull(),
+  title: text('title').notNull(),
+  description: text('description').notNull().default(''),
+  status: text('status', { enum: ['todo', 'in-progress', 'review', 'done'] }).notNull().default('todo'),
+  priority: text('priority', { enum: ['low', 'medium', 'high', 'critical'] }).notNull().default('medium'),
+  assignee: text('assignee'),
+  createdAt: text('created_at').notNull(),
+  updatedAt: text('updated_at').notNull(),
+})
+
+/** Task comments table — comments on Kanban cards */
+export const taskComments = sqliteTable('task_comments', {
+  id: text('id').primaryKey(),
+  taskId: text('task_id').notNull(),
+  author: text('author').notNull(),
+  content: text('content').notNull(),
+  emoji: text('emoji'),
+  createdAt: text('created_at').notNull(),
+})
+
+// ============================================================================
+// Phase 5 — Cost Entries (persistent costing)
+// ============================================================================
+
+/** Cost entries table — persisted usage records */
+export const costEntries = sqliteTable('cost_entries', {
+  id: text('id').primaryKey(),
+  model: text('model').notNull(),
+  provider: text('provider', { enum: ['anthropic', 'openai', 'google', 'local'] }).notNull(),
+  inputTokens: integer('input_tokens').notNull(),
+  outputTokens: integer('output_tokens').notNull(),
+  costUsd: real('cost_usd').notNull(),
+  timestamp: text('timestamp').notNull(),
+})

@@ -24,6 +24,20 @@ export type IpcChannel =
 	| 'permissions:set-level'
 	| 'permissions:evaluate'
 	| 'agent:resume'
+	| 'mcp:list-servers'
+	| 'mcp:get-locks'
+	| 'mcp:release-lock'
+	| 'kanban:list-tasks'
+	| 'kanban:create-task'
+	| 'kanban:update-task'
+	| 'kanban:delete-task'
+	| 'kanban:add-comment'
+	| 'kanban:get-board'
+	| 'costing:get-summary'
+	| 'costing:get-entries'
+	| 'tailscale:status'
+	| 'tailscale:up'
+	| 'tailscale:down'
 
 /** IPC message envelope */
 export interface IpcMessage<T = unknown> {
@@ -64,6 +78,20 @@ export interface IpcHandlerMap {
 	'permissions:set-level': { request: { level: string }; response: void }
 	'permissions:evaluate': { request: { action: string }; response: PermissionsEvaluateResponse }
 	'agent:resume': { request: { agentId: string; approved: boolean }; response: void }
+	'mcp:list-servers': { request: void; response: McpListServersResponse }
+	'mcp:get-locks': { request: void; response: McpGetLocksResponse }
+	'mcp:release-lock': { request: { path: string; ownerId: string }; response: void }
+	'kanban:list-tasks': { request: KanbanListTasksRequest; response: KanbanListTasksResponse }
+	'kanban:create-task': { request: KanbanCreateTaskRequest; response: KanbanCreateTaskResponse }
+	'kanban:update-task': { request: KanbanUpdateTaskRequest; response: void }
+	'kanban:delete-task': { request: { taskId: string }; response: void }
+	'kanban:add-comment': { request: KanbanAddCommentRequest; response: void }
+	'kanban:get-board': { request: { projectId: string }; response: KanbanGetBoardResponse }
+	'costing:get-summary': { request: CostingGetSummaryRequest; response: CostingGetSummaryResponse }
+	'costing:get-entries': { request: CostingGetEntriesRequest; response: CostingGetEntriesResponse }
+	'tailscale:status': { request: void; response: TailscaleStatusResponse }
+	'tailscale:up': { request: void; response: TailscaleUpDownResponse }
+	'tailscale:down': { request: void; response: TailscaleUpDownResponse }
 }
 
 /** Shape of permissions profile response */
@@ -80,6 +108,173 @@ export interface PermissionsEvaluateResponse {
 	readonly verdict: string
 	readonly comfortLevel: string
 	readonly reason: string
+}
+
+/** MCP list servers response */
+export interface McpListServersResponse {
+	readonly servers: readonly {
+		readonly id: string
+		readonly name: string
+		readonly description: string
+		readonly toolCount: number
+		readonly enabled: boolean
+	}[]
+}
+
+/** MCP get locks response */
+export interface McpGetLocksResponse {
+	readonly locks: readonly {
+		readonly path: string
+		readonly ownerId: string
+		readonly acquiredAt: number
+		readonly expiresAt: number
+	}[]
+}
+
+// ============================================================================
+// Kanban IPC Types
+// ============================================================================
+
+/** Request to list tasks — optional filter */
+export interface KanbanListTasksRequest {
+	readonly projectId: string
+	readonly status?: string | undefined
+	readonly priority?: string | undefined
+	readonly assignee?: string | undefined
+	readonly search?: string | undefined
+}
+
+/** Response with an array of tasks */
+export interface KanbanListTasksResponse {
+	readonly tasks: readonly {
+		readonly id: string
+		readonly projectId: string
+		readonly title: string
+		readonly description: string
+		readonly status: string
+		readonly priority: string
+		readonly assignee?: string | undefined
+		readonly commentCount: number
+		readonly createdAt: string
+		readonly updatedAt: string
+	}[]
+}
+
+/** Request to create a task */
+export interface KanbanCreateTaskRequest {
+	readonly projectId: string
+	readonly title: string
+	readonly description: string
+	readonly priority: string
+	readonly assignee?: string | undefined
+}
+
+/** Response after creating a task */
+export interface KanbanCreateTaskResponse {
+	readonly taskId: string
+}
+
+/** Request to update a task */
+export interface KanbanUpdateTaskRequest {
+	readonly taskId: string
+	readonly title?: string | undefined
+	readonly description?: string | undefined
+	readonly status?: string | undefined
+	readonly priority?: string | undefined
+	readonly assignee?: string | undefined
+}
+
+/** Request to add a comment to a task */
+export interface KanbanAddCommentRequest {
+	readonly taskId: string
+	readonly content: string
+	readonly author: string
+	readonly emoji?: string | undefined
+}
+
+/** Response with grouped Kanban board state */
+export interface KanbanGetBoardResponse {
+	readonly columns: Readonly<Record<string, readonly {
+		readonly id: string
+		readonly title: string
+		readonly status: string
+		readonly priority: string
+		readonly assignee?: string | undefined
+		readonly commentCount: number
+	}[]>>
+	readonly taskCount: number
+}
+
+// ============================================================================
+// Costing IPC Types
+// ============================================================================
+
+/** Request for cost summary */
+export interface CostingGetSummaryRequest {
+	readonly periodStart?: string | undefined
+	readonly periodEnd?: string | undefined
+}
+
+/** Response with cost summary */
+export interface CostingGetSummaryResponse {
+	readonly totalCostUsd: number
+	readonly totalInputTokens: number
+	readonly totalOutputTokens: number
+	readonly entriesByModel: Readonly<Record<string, {
+		readonly model: string
+		readonly provider: string
+		readonly totalCostUsd: number
+		readonly totalInputTokens: number
+		readonly totalOutputTokens: number
+		readonly callCount: number
+	}>>
+	readonly periodStart: string
+	readonly periodEnd: string
+}
+
+/** Request for cost entries */
+export interface CostingGetEntriesRequest {
+	readonly limit?: number | undefined
+	readonly offset?: number | undefined
+}
+
+/** Response with cost entries */
+export interface CostingGetEntriesResponse {
+	readonly entries: readonly {
+		readonly model: string
+		readonly provider: string
+		readonly inputTokens: number
+		readonly outputTokens: number
+		readonly costUsd: number
+		readonly timestamp: string
+	}[]
+	readonly total: number
+}
+
+// ============================================================================
+// Tailscale IPC Types
+// ============================================================================
+
+/** Response with Tailscale status */
+export interface TailscaleStatusResponse {
+	readonly backendState: string
+	readonly selfHostname: string
+	readonly selfIp: string
+	readonly tailnet: string
+	readonly peers: readonly {
+		readonly id: string
+		readonly hostname: string
+		readonly ipv4: string
+		readonly online: boolean
+		readonly os: string
+	}[]
+	readonly version: string
+}
+
+/** Response for tailscale up/down */
+export interface TailscaleUpDownResponse {
+	readonly success: boolean
+	readonly error?: string | undefined
 }
 
 /** Shape of the onboarding check response sent over IPC */
