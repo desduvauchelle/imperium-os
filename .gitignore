@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+.turbo/
+
+# Bun
+bun.lockb
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/settings.json
+.idea/
+
+# Projects local storage (keep .gitkeep)
+projects/*
+!projects/.gitkeep
+
+# Electron
+apps/electron/out/
+apps/electron/release/
+
+# Test coverage
+coverage/
