@@ -1,4 +1,4 @@
-import type { AgentId, MessageId, ProjectId, Timestamp } from './brand.js'
+import type { AgentId, MemoryBlockId, MessageId, ProjectId, Timestamp } from './brand.js'
 
 // ============================================================================
 // Agent Types
@@ -41,7 +41,7 @@ export interface AgentContext {
   readonly systemPrompt: string
   readonly messageHistory: readonly MessageId[]
   readonly fileTreeDepth: number
-  readonly memoryBlockIds: readonly string[]
+  readonly memoryBlockIds: readonly MemoryBlockId[]
 }
 
 /** Serializable agent state for persistence */

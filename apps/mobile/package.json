@@ -1,0 +1,12 @@
+{
+  "name": "@imperium/mobile",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "echo 'Post-MVP: No build yet'",
+    "typecheck": "echo 'Post-MVP: No typecheck yet'",
+    "test": "echo 'Post-MVP: No tests yet'",
+    "lint": "echo 'Post-MVP: No lint yet'"
+  }
+}

@@ -18,6 +18,8 @@ export type IpcChannel =
   | 'notification:dismiss'
   | 'system:power-mode'
   | 'system:quit'
+  | 'onboarding:check'
+  | 'onboarding:install'
 
 /** IPC message envelope */
 export interface IpcMessage<T = unknown> {
@@ -52,4 +54,20 @@ export interface IpcHandlerMap {
   'notification:dismiss': { request: { id: string }; response: void }
   'system:power-mode': { request: { enabled: boolean }; response: void }
   'system:quit': { request: void; response: void }
+  'onboarding:check': { request: void; response: OnboardingCheckResponse }
+  'onboarding:install': { request: { name: string }; response: { success: boolean; error?: string } }
+}
+
+/** Shape of the onboarding check response sent over IPC */
+export interface OnboardingCheckResponse {
+  readonly results: readonly {
+    readonly name: string
+    readonly command: string
+    readonly installed: boolean
+    readonly version?: string
+    readonly required: boolean
+    readonly installUrl: string
+    readonly error?: string
+  }[]
+  readonly allRequiredInstalled: boolean
 }

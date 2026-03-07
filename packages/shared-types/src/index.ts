@@ -11,6 +11,7 @@ export type {
   SessionId,
   MessageId,
   NotificationId,
+  MemoryBlockId,
   Timestamp,
 } from './brand.js'
 export {
@@ -21,6 +22,7 @@ export {
   createSessionId,
   createMessageId,
   createNotificationId,
+  createMemoryBlockId,
   createTimestamp,
 } from './brand.js'
 
@@ -103,7 +105,19 @@ export type {
   IpcMessage,
   IpcResponse,
   IpcHandlerMap,
+  OnboardingCheckResponse,
 } from './ipc.js'
+
+// LLM
+export type {
+  LlmProviderType,
+  LlmRole,
+  LlmMessage,
+  LlmCompletionOptions,
+  LlmCompletionResult,
+  LlmProvider,
+} from './llm.js'
+export { LLM_PROVIDER_TYPES, isLlmProviderType } from './llm.js'
 
 // Result
 export type { Result } from './result.js'

@@ -27,36 +27,43 @@ export type MessageId = Brand<string, 'MessageId'>
 /** Branded string type for Notification IDs */
 export type NotificationId = Brand<string, 'NotificationId'>
 
+/** Branded string type for Memory Block IDs */
+export type MemoryBlockId = Brand<string, 'MemoryBlockId'>
+
 // ============================================================================
 // Brand Constructors - Runtime ID creation
 // ============================================================================
 
 export function createProjectId(id: string): ProjectId {
-  return id as ProjectId
+	return id as ProjectId
 }
 
 export function createUserId(id: string): UserId {
-  return id as UserId
+	return id as UserId
 }
 
 export function createTaskId(id: string): TaskId {
-  return id as TaskId
+	return id as TaskId
 }
 
 export function createAgentId(id: string): AgentId {
-  return id as AgentId
+	return id as AgentId
 }
 
 export function createSessionId(id: string): SessionId {
-  return id as SessionId
+	return id as SessionId
 }
 
 export function createMessageId(id: string): MessageId {
-  return id as MessageId
+	return id as MessageId
 }
 
 export function createNotificationId(id: string): NotificationId {
-  return id as NotificationId
+	return id as NotificationId
+}
+
+export function createMemoryBlockId(id: string): MemoryBlockId {
+	return id as MemoryBlockId
 }
 
 // ============================================================================
@@ -67,5 +74,5 @@ export function createNotificationId(id: string): NotificationId {
 export type Timestamp = Brand<string, 'Timestamp'>
 
 export function createTimestamp(date?: Date): Timestamp {
-  return (date ?? new Date()).toISOString() as Timestamp
+	return (date ?? new Date()).toISOString() as Timestamp
 }

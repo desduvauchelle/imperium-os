@@ -1,4 +1,4 @@
-import type { MessageId, ProjectId, Timestamp } from './brand.js'
+import type { MemoryBlockId, MessageId, ProjectId, Timestamp } from './brand.js'
 
 // ============================================================================
 // Memory & Chat Types
@@ -18,6 +18,7 @@ export function isChatRole(value: unknown): value is ChatRole {
 /** Individual chat message */
 export interface ChatMessage {
   readonly id: MessageId
+  readonly projectId: ProjectId
   readonly role: ChatRole
   readonly content: string
   readonly timestamp: Timestamp
@@ -28,7 +29,7 @@ export interface ChatMessage {
 
 /** Summarized memory block */
 export interface MemoryBlock {
-  readonly id: string
+  readonly id: MemoryBlockId
   readonly projectId: ProjectId
   readonly summary: string
   readonly messageRange: {
