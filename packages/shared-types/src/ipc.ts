@@ -8,6 +8,7 @@ export type IpcChannel =
 	| 'theme:set'
 	| 'theme:changed'
 	| 'project:list'
+	| 'project:create'
 	| 'project:open'
 	| 'project:close'
 	| 'agent:start'

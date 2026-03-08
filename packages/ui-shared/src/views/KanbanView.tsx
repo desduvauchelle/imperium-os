@@ -9,6 +9,7 @@ import {
 import { KanbanBoard } from '../components/kanban-board.js'
 import { KanbanColumn, getColumnLabel } from '../components/kanban-column.js'
 import { KanbanCard } from '../components/kanban-card.js'
+import { KanbanCardDrawer } from '../components/kanban-card-drawer.js'
 import { useSatellite } from '../satellite/SatelliteContext.js'
 import type { KanbanGetBoardResponse } from '@imperium/shared-types'
 
@@ -23,6 +24,7 @@ export function KanbanView({ projectId = 'default' }: KanbanViewProps) {
 	const { invoke } = useSatellite()
 	const [board, setBoard] = useState<KanbanGetBoardResponse | null>(null)
 	const [error, setError] = useState<string | undefined>(undefined)
+	const [expandedCardId, setExpandedCardId] = useState<string | null>(null)
 
 	const load = useCallback(async () => {
 		try {
@@ -35,6 +37,11 @@ export function KanbanView({ projectId = 'default' }: KanbanViewProps) {
 	}, [invoke, projectId])
 
 	useEffect(() => { void load() }, [load])
+
+	function handleLaunch(taskId: string) {
+		// Stub — will invoke agent:start in a future sprint
+		console.log('Launch agent for task', taskId)
+	}
 
 	if (error !== undefined) {
 		return (
@@ -64,16 +71,32 @@ export function KanbanView({ projectId = 'default' }: KanbanViewProps) {
 							label={getColumnLabel(status)}
 							count={tasks.length}
 						>
-							{tasks.map((task) => (
-								<KanbanCard
-									key={task.id}
-									id={task.id}
-									title={task.title}
-									priority={task.priority as 'low' | 'medium' | 'high' | 'critical'}
-									assignee={task.assignee}
-									commentCount={task.commentCount}
-								/>
-							))}
+							{tasks.map((task) => {
+								const assigneeType =
+									task.assignee === 'agent' ? 'ai'
+									: task.assignee ? 'human'
+									: undefined
+								return (
+									<div key={task.id}>
+										<KanbanCard
+											id={task.id}
+											title={task.title}
+											priority={task.priority as 'low' | 'medium' | 'high' | 'critical'}
+											assignee={task.assignee}
+											assigneeType={assigneeType}
+											commentCount={task.commentCount}
+											onLaunch={assigneeType === 'ai' ? () => handleLaunch(task.id) : undefined}
+											onClick={() =>
+												setExpandedCardId((prev) => (prev === task.id ? null : task.id))
+											}
+										/>
+										<KanbanCardDrawer
+											taskId={task.id}
+											isOpen={expandedCardId === task.id}
+										/>
+									</div>
+								)
+							})}
 						</KanbanColumn>
 					)
 				})}

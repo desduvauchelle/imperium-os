@@ -8,8 +8,13 @@ export default defineConfig({
 	build: {
 		outDir: '../../dist/renderer',
 	},
+	optimizeDeps: {
+		noDiscovery: true,
+		include: ['react', 'react-dom', 'react/jsx-runtime', 'react/jsx-dev-runtime'],
+	},
 	server: {
 		port: 5173,
 		strictPort: true,
+		host: '127.0.0.1',
 	},
 })

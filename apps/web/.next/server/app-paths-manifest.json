@@ -1,0 +1,4 @@
+{
+  "/api/invoke/route": "app/api/invoke/route.js",
+  "/dashboard/page": "app/dashboard/page.js"
+}

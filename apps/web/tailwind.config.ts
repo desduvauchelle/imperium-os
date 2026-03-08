@@ -4,8 +4,9 @@ import { imperiumPreset } from '@imperium/ui-shared/tailwind-config'
 export default {
   presets: [imperiumPreset],
   content: [
-    './src/**/*.{ts,tsx}',
-    './index.html',
+    './app/**/*.{ts,tsx}',
+    './components/**/*.{ts,tsx}',
+    './lib/**/*.{ts,tsx}',
     '../../packages/ui-shared/src/**/*.{ts,tsx}',
   ],
   darkMode: 'class',

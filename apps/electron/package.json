@@ -7,8 +7,8 @@
 	"type": "module",
 	"main": "dist/main/index.js",
 	"scripts": {
-		"dev": "concurrently -k --names VITE,ELECTRON -c cyan,magenta \"bun run dev:renderer\" \"bun run dev:electron\"",
-		"dev:renderer": "vite --strictPort",
+		"dev": "bun scripts/dev.ts",
+		"dev:renderer": "node ../../node_modules/vite/bin/vite.js",
 		"dev:electron": "bun run build:main && bun run build:preload && bunx electron .",
 		"start": "ELECTRON_USE_LOCAL_RENDERER=1 bun run build && electron .",
 		"build:renderer": "vite build",

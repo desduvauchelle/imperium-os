@@ -27,7 +27,7 @@ export interface MainProcessConfig {
 }
 
 export const DEFAULT_MAIN_CONFIG: MainProcessConfig = {
-	devServerUrl: 'http://localhost:5173',
+	devServerUrl: 'http://127.0.0.1:5173',
 	width: 1200,
 	height: 800,
 }

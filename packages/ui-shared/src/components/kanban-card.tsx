@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { Badge } from './badge.js'
+import { Button } from './button.js'
 import { cn } from '../lib/utils.js'
 
 // ============================================================================
@@ -15,6 +16,10 @@ export interface KanbanCardProps {
   readonly priority: string
   /** Task assignee */
   readonly assignee?: string | undefined
+  /** Whether the assignee is 'ai' or 'human' */
+  readonly assigneeType?: 'ai' | 'human' | undefined
+  /** Called when the Launch button is clicked (only shown for ai-assigned cards) */
+  readonly onLaunch?: (() => void) | undefined
   /** Number of comments */
   readonly commentCount: number
   /** Optional additional CSS classes */
@@ -43,6 +48,8 @@ export function KanbanCard({
   title,
   priority,
   assignee,
+  assigneeType,
+  onLaunch,
   commentCount,
   className,
   onClick,
@@ -73,14 +80,39 @@ export function KanbanCard({
         </Badge>
       </div>
       <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
-        {assignee ? (
-          <span data-testid="kanban-card-assignee">{assignee}</span>
-        ) : (
-          <span>Unassigned</span>
-        )}
-        {commentCount > 0 && (
-          <span data-testid="kanban-card-comments">💬 {commentCount}</span>
-        )}
+        <div className="flex items-center gap-1.5">
+          {assignee ? (
+            <span data-testid="kanban-card-assignee">{assignee}</span>
+          ) : (
+            <span>Unassigned</span>
+          )}
+          {assigneeType === 'ai' && (
+            <Badge variant="secondary" className="text-[10px] h-4 px-1.5 font-normal" data-testid="kanban-card-ai-badge">
+              AI
+            </Badge>
+          )}
+          {assigneeType === 'human' && (
+            <Badge variant="outline" className="text-[10px] h-4 px-1.5 font-normal" data-testid="kanban-card-human-badge">
+              Human
+            </Badge>
+          )}
+        </div>
+        <div className="flex items-center gap-1.5">
+          {commentCount > 0 && (
+            <span data-testid="kanban-card-comments">💬 {commentCount}</span>
+          )}
+          {assigneeType === 'ai' && onLaunch && (
+            <Button
+              size="sm"
+              variant="default"
+              className="h-5 px-2 text-[10px]"
+              data-testid="kanban-card-launch-btn"
+              onClick={(e) => { e.stopPropagation(); onLaunch() }}
+            >
+              Launch
+            </Button>
+          )}
+        </div>
       </div>
     </div>
   )

@@ -1,3 +1,4 @@
+'use client'
 // ============================================================================
 // @imperium/ui-shared - Shared UI Component Library
 // ============================================================================
@@ -21,6 +22,9 @@ export type { CostTagProps } from './components/cost-tag.js'
 // Kanban Components
 export { KanbanCard } from './components/kanban-card.js'
 export type { KanbanCardProps } from './components/kanban-card.js'
+
+export { KanbanCardDrawer } from './components/kanban-card-drawer.js'
+export type { KanbanCardDrawerProps, DrawerChatMessage } from './components/kanban-card-drawer.js'
 
 export { KanbanColumn, getColumnLabel } from './components/kanban-column.js'
 export type { KanbanColumnProps } from './components/kanban-column.js'
@@ -72,6 +76,20 @@ export { PermissionsView } from './views/PermissionsView.js'
 
 export { SettingsView } from './views/SettingsView.js'
 export type { SettingsViewProps } from './views/SettingsView.js'
+
+export { ProjectWorkspace } from './views/ProjectWorkspace.js'
+export type { ProjectWorkspaceProps } from './views/ProjectWorkspace.js'
+
+export { OverviewView } from './views/OverviewView.js'
+export type { OverviewViewProps } from './views/OverviewView.js'
+
+export { ChatView } from './views/ChatView.js'
+export type { ChatViewProps } from './views/ChatView.js'
+
+export { GlobalConnectionsView } from './views/GlobalConnectionsView.js'
+
+export { ProjectMcpView } from './views/ProjectMcpView.js'
+export type { ProjectMcpViewProps } from './views/ProjectMcpView.js'
 
 // ============================================================================
 // Shell — layout shells and navigation components
