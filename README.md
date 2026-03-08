@@ -26,12 +26,20 @@ curl -fsSL https://bun.sh/install | bash
 
 ## Quick Start
 
-To install all dependencies, build the workspace, and run the Electron app in development mode, simply run:
+If you only want the **Master Electron app** and want to run it like a normal client app, use:
 
 ```bash
 git clone https://github.com/your-org/imperium-os.git
 cd imperium-os
 bun run start
+```
+
+This installs dependencies, builds the Electron app, and opens the desktop window directly from the built renderer.
+
+For day-to-day development with hot reload, use:
+
+```bash
+bun run dev
 ```
 
 ---
@@ -57,9 +65,9 @@ bun run build
 Build a single app:
 
 ```bash
-bun run --cwd apps/electron build    # Electron renderer (Vite)
-bun run --cwd apps/web      build    # Web SPA (Vite)
-bun run --cwd apps/mobile   build    # Mobile web bundle (Vite)
+cd apps/electron && bun run build    # Electron renderer (Vite)
+cd apps/web && bun run build         # Web SPA (Vite)
+cd apps/mobile && bun run build      # Mobile web bundle (Vite)
 ```
 
 ---
@@ -68,24 +76,36 @@ bun run --cwd apps/mobile   build    # Mobile web bundle (Vite)
 
 ### Desktop (Electron Master)
 
-The recommended way is to use `bun run start` for the first run, or `bun run dev` for subsequent sessions with Hot Module Replacement (HMR).
+The simplest commands are:
 
-Alternatively, you can run the renderer and main process separately:
+```bash
+# Run like a client app (build once, then launch Electron directly)
+bun run start
+
+# Run in development with hot reload
+bun run dev
+```
+
+If you want hot reload and the Vite renderer in development, use `bun run dev`.
+
+If you want to run the parts manually, use:
 
 Open two terminals:
 
 ```bash
 # Terminal 1 — Vite renderer dev server (HMR on http://localhost:5173)
-bun run --cwd apps/electron dev
+cd apps/electron && bun run dev:renderer
 
 # Terminal 2 — Electron main process (loads the renderer)
-bun run --cwd apps/electron electron:dev
+cd apps/electron && bun run dev:electron
 ```
+
+If port `5173` is already in use, the dev server now fails fast instead of silently moving to another port. Free that port and run `bun run dev` again.
 
 ### Web Satellite
 
 ```bash
-bun run --cwd apps/web dev          # http://localhost:5174
+cd apps/web && bun run dev          # http://localhost:5174
 ```
 
 On first load the app shows a **"Connect to Master"** modal. Enter the Master's IP (e.g. `http://192.168.1.x:9100`) and the shared token shown in the Electron **Satellite Settings** panel.
@@ -94,14 +114,14 @@ On first load the app shows a **"Connect to Master"** modal. Enter the Master's 
 
 ```bash
 # Build the web bundle first
-bun run --cwd apps/mobile build
+cd apps/mobile && bun run build
 
 # Sync to native projects
-bun run --cwd apps/mobile cap:sync
+cd apps/mobile && bun run cap:sync
 
 # Run on device / simulator
-bun run --cwd apps/mobile cap:run:ios
-bun run --cwd apps/mobile cap:run:android
+cd apps/mobile && bun run cap:run:ios
+cd apps/mobile && bun run cap:run:android
 ```
 
 ---
@@ -113,10 +133,10 @@ bun run --cwd apps/mobile cap:run:android
 bun run test
 
 # Single package
-bun run --cwd packages/core/notifications test
-bun run --cwd apps/electron               test
-bun run --cwd apps/web                    test
-bun run --cwd apps/mobile                 test
+cd packages/core/notifications && bun run test
+cd apps/electron && bun run test
+cd apps/web && bun run test
+cd apps/mobile && bun run test
 ```
 
 ---
@@ -135,7 +155,7 @@ bun run lint        # Biome check across all packages
 Produces a signed/unsigned distributable in `apps/electron/release/`:
 
 ```bash
-bun run --cwd apps/electron electron:build
+cd apps/electron && bun run electron:build
 ```
 
 | Platform | Output |
@@ -162,6 +182,7 @@ Because the application might be unsigned by default, users installing the app m
 When attempting to open an unsigned `.app` on macOS, it may display a warning that the app is damaged or from an unidentified developer.
 
 **To bypass this:**
+
 1. Right-click (or Control-click) the application in Finder.
 2. Select **Open**.
 3. In the dialog that appears, click **Open** again.
@@ -171,6 +192,7 @@ Alternatively, if Gatekeeper completely blocks it with a "damaged" error, the us
 ```bash
 xattr -cr /Applications/Imperium.app
 ```
+
 (Adjust the path if the app is placed elsewhere).
 
 ---

@@ -32,6 +32,8 @@ export const DEFAULT_MAIN_CONFIG: MainProcessConfig = {
 	height: 800,
 }
 
+let mainWindow: BrowserWindow | null = null
+
 // ============================================================================
 // Phase 6 — Satellite server (REST + WS gateway)
 // ============================================================================
@@ -128,6 +130,8 @@ export function createSatelliteManager(handlers: HandlerMap, serveFn: ServeFn = 
 export function createMainWindow(config: MainProcessConfig = DEFAULT_MAIN_CONFIG): BrowserWindow {
 	const __dirname = dirname(fileURLToPath(import.meta.url))
 	const preloadPath = join(__dirname, '../preload/index.js')
+	const rendererHtmlPath = join(__dirname, '../renderer/index.html')
+	const forceLocalRenderer = process.env['ELECTRON_USE_LOCAL_RENDERER'] === '1'
 
 	const win = new BrowserWindow({
 		width: config.width,
@@ -140,23 +144,32 @@ export function createMainWindow(config: MainProcessConfig = DEFAULT_MAIN_CONFIG
 		}
 	})
 
-	if (!app.isPackaged) {
+	mainWindow = win
+	win.on('closed', () => {
+		if (mainWindow === win) {
+			mainWindow = null
+		}
+	})
+
+	if (!app.isPackaged && !forceLocalRenderer) {
 		const loadDevServer = async () => {
 			for (let i = 0; i < 15; i++) {
 				try {
 					await win.loadURL(config.devServerUrl)
+					win.webContents.openDevTools()
 					return // Success!
 				} catch (err) {
 					console.log(`[Electron] Vite server not ready yet. Retrying in 500ms... (${i + 1}/15)`)
 					await new Promise(resolve => setTimeout(resolve, 500))
 				}
 			}
-			console.error("[Electron] Failed to connect to Vite dev server after 15 attempts.")
+
+			console.warn('[Electron] Failed to connect to Vite dev server after 15 attempts. Falling back to built renderer.')
+			await win.loadFile(rendererHtmlPath)
 		}
 		loadDevServer().catch(console.error)
-		win.webContents.openDevTools()
 	} else {
-		win.loadFile(join(__dirname, '../../dist/renderer/index.html')).catch(console.error)
+		win.loadFile(rendererHtmlPath).catch(console.error)
 	}
 
 	win.webContents.on('console-message', (event, level, message, line, sourceId) => {
@@ -379,7 +392,7 @@ app.whenReady().then(() => {
 	createMainWindow()
 
 	app.on('activate', () => {
-		if (BrowserWindow.getAllWindows().length === 0) {
+		if (mainWindow === null || BrowserWindow.getAllWindows().length === 0) {
 			createMainWindow()
 		}
 	})

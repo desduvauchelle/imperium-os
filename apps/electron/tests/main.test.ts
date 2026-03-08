@@ -1,20 +1,52 @@
 import { describe, expect, it, vi } from 'vitest'
 
+vi.mock('@imperium/core-db', () => ({
+	createDb: vi.fn().mockReturnValue({}),
+	ProjectRepository: vi.fn().mockImplementation(() => ({
+		listAll: vi.fn().mockResolvedValue([]),
+		create: vi.fn().mockResolvedValue({ id: '1', name: 'test', description: '', status: 'active', comfortLevel: 'low', createdAt: '', updatedAt: '' }),
+		findById: vi.fn().mockResolvedValue(null),
+		delete: vi.fn().mockResolvedValue(undefined),
+	})),
+	TaskRepository: vi.fn().mockImplementation(() => ({
+		listByProject: vi.fn().mockResolvedValue([]),
+		create: vi.fn().mockResolvedValue({}),
+		findById: vi.fn().mockResolvedValue(null),
+		delete: vi.fn().mockResolvedValue(undefined),
+		complete: vi.fn().mockResolvedValue(undefined),
+		updateStatus: vi.fn().mockResolvedValue(undefined),
+	})),
+	CostEntryRepository: vi.fn().mockImplementation(() => ({
+		create: vi.fn().mockResolvedValue({}),
+		listByProject: vi.fn().mockResolvedValue([]),
+		getTotal: vi.fn().mockResolvedValue(0),
+		stats: vi.fn().mockResolvedValue([]),
+	})),
+	projects: {},
+}))
+
 vi.mock('electron', () => ({
 	app: {
 		isPackaged: false,
 		whenReady: vi.fn().mockResolvedValue(true),
 		on: vi.fn(),
 		quit: vi.fn(),
+		getPath: vi.fn().mockReturnValue('/tmp'),
 	},
 	BrowserWindow: vi.fn().mockImplementation((config) => ({
 		...config,
 		loadURL: vi.fn().mockReturnValue({ catch: vi.fn() }),
 		loadFile: vi.fn().mockReturnValue({ catch: vi.fn() }),
+		webContents: { openDevTools: vi.fn(), on: vi.fn() },
+		on: vi.fn(),
 	})),
 	ipcMain: {
 		handle: vi.fn(),
 		on: vi.fn(),
+	},
+	powerSaveBlocker: {
+		start: vi.fn().mockReturnValue(0),
+		stop: vi.fn(),
 	},
 }))
 

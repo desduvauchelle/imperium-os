@@ -25,7 +25,8 @@ export class ProjectRepository {
 			.from(projects)
 			.orderBy(desc(projects.createdAt))
 
-		return rows.map(row => ({
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call
+		return rows.map((row: { id: string; name: string; description: string; status: string; comfortLevel: string; createdAt: string; updatedAt: string }) => ({
 			id: row.id as ProjectId,
 			name: row.name,
 			description: row.description,

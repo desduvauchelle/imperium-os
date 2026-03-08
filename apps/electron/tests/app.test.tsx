@@ -25,9 +25,11 @@ const mockProfile: PermissionsProfileResponse = {
 }
 
 beforeEach(() => {
+  localStorage.clear()
   window.electronApi = {
     invoke: vi.fn().mockImplementation((channel: string) => {
       if (channel === 'permissions:get-profile') return Promise.resolve(mockProfile)
+      if (channel === 'project:list') return Promise.resolve([])
       return Promise.resolve(allInstalledResponse)
     }),
     on: vi.fn().mockReturnValue(() => {}),
@@ -50,32 +52,31 @@ describe('App', () => {
     fireEvent.click(screen.getByTestId('continue-btn'))
     await waitFor(() => {
       expect(screen.getByText('Imperium OS')).toBeInTheDocument()
-      expect(screen.getByText(/Phase 3/)).toBeInTheDocument()
+      expect(screen.getByText('No projects found.')).toBeInTheDocument()
     })
   })
 
-  it('renders theme toggle buttons after onboarding', async () => {
+  it('renders navigation panel after onboarding', async () => {
     render(<App />)
     await waitFor(() => {
       expect(screen.getByTestId('continue-btn')).not.toBeDisabled()
     })
     fireEvent.click(screen.getByTestId('continue-btn'))
     await waitFor(() => {
-      expect(screen.getByText('Light')).toBeInTheDocument()
-      expect(screen.getByText('Dark')).toBeInTheDocument()
-      expect(screen.getByText('Auto')).toBeInTheDocument()
+      expect(screen.getByText('Overview')).toBeInTheDocument()
+      expect(screen.getByText('Tailscale')).toBeInTheDocument()
+      expect(screen.getByText('Satellite Config')).toBeInTheDocument()
     })
   })
 
-  it('renders cost tags after onboarding', async () => {
+  it('renders welcome screen after onboarding when no projects exist', async () => {
     render(<App />)
     await waitFor(() => {
       expect(screen.getByTestId('continue-btn')).not.toBeDisabled()
     })
     fireEvent.click(screen.getByTestId('continue-btn'))
     await waitFor(() => {
-      expect(screen.getByText('Claude 3.5 Sonnet')).toBeInTheDocument()
-      expect(screen.getByText('GPT-4o')).toBeInTheDocument()
+      expect(screen.getByText('Welcome to Imperium')).toBeInTheDocument()
     })
   })
 })
