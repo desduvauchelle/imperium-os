@@ -70,29 +70,22 @@ describe('Mobile App — connected shell', () => {
     localStorage.clear()
   })
 
-  it('shows satellite shell when config is stored', () => {
+  it('shows mobile shell when config is stored', () => {
     render(<App />)
-    expect(screen.getByTestId('satellite-shell')).toBeInTheDocument()
+    expect(screen.getByTestId('mobile-shell')).toBeInTheDocument()
   })
 
-  it('renders the sidebar navigation', () => {
+  it('renders the bottom navigation', () => {
     render(<App />)
-    expect(screen.getByTestId('satellite-sidebar')).toBeInTheDocument()
+    expect(screen.getByTestId('bottom-nav')).toBeInTheDocument()
   })
 
-  it('sidebar shows Master Offline badge when not connected', () => {
+  it('bottom nav shows Master Offline badge when not connected', () => {
     render(<App />)
     expect(screen.getByTestId('master-offline-badge')).toBeInTheDocument()
   })
 
-  it('renders theme toggle buttons', () => {
-    render(<App />)
-    expect(screen.getByTestId('theme-light')).toBeInTheDocument()
-    expect(screen.getByTestId('theme-dark')).toBeInTheDocument()
-    expect(screen.getByTestId('theme-auto')).toBeInTheDocument()
-  })
-
-  it('renders sidebar nav items', () => {
+  it('renders nav items in bottom nav', () => {
     render(<App />)
     expect(screen.getByTestId('nav-kanban')).toBeInTheDocument()
     expect(screen.getByTestId('nav-costing')).toBeInTheDocument()
@@ -103,3 +96,4 @@ describe('Mobile App — connected shell', () => {
     expect(screen.getByTestId('nav-settings')).toBeInTheDocument()
   })
 })
+

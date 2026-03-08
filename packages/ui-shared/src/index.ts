@@ -51,3 +51,42 @@ export type { SatelliteConfig, SatelliteConfigModalProps } from './satellite/Sat
 
 // Utilities
 export { cn } from './lib/utils.js'
+
+// ============================================================================
+// Views — feature-level views shared across all platforms
+// ============================================================================
+
+export { KanbanView } from './views/KanbanView.js'
+export type { KanbanViewProps } from './views/KanbanView.js'
+
+export { CostingView } from './views/CostingView.js'
+export type { CostingViewProps } from './views/CostingView.js'
+
+export { TailscaleView } from './views/TailscaleView.js'
+
+export { McpView } from './views/McpView.js'
+
+export { AgentView } from './views/AgentView.js'
+
+export { PermissionsView } from './views/PermissionsView.js'
+
+export { SettingsView } from './views/SettingsView.js'
+export type { SettingsViewProps } from './views/SettingsView.js'
+
+// ============================================================================
+// Shell — layout shells and navigation components
+// ============================================================================
+
+export { AppSidebar, DEFAULT_NAV_ITEMS } from './shell/AppSidebar.js'
+export type { AppSidebarProps, NavItem } from './shell/AppSidebar.js'
+
+export { BottomNav } from './shell/BottomNav.js'
+export type { BottomNavProps } from './shell/BottomNav.js'
+
+export { ThemeToggle } from './shell/ThemeToggle.js'
+
+export { AppShell } from './shell/AppShell.js'
+export type { AppShellProps } from './shell/AppShell.js'
+
+export { MobileShell } from './shell/MobileShell.js'
+export type { MobileShellProps } from './shell/MobileShell.js'
