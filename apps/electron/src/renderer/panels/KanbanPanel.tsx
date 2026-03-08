@@ -59,12 +59,11 @@ export function KanbanPanel({ projectId, invoke }: KanbanPanelProps) {
 	}
 
 	return (
-		<Card data-testid="kanban-panel">
-			<CardHeader>
-				<CardTitle>Kanban Board</CardTitle>
-				<CardDescription>{board.taskCount} task(s)</CardDescription>
-			</CardHeader>
-			<CardContent>
+		<div data-testid="kanban-panel" className="h-[calc(100vh-8rem)] flex flex-col">
+			<div className="mb-4">
+				<p className="text-sm text-muted-foreground">{board.taskCount} task(s)</p>
+			</div>
+			<div className="flex-1 overflow-hidden">
 				<KanbanBoard>
 					{COLUMNS.map((status) => {
 						const tasks = board.columns[status] ?? []
@@ -89,7 +88,7 @@ export function KanbanPanel({ projectId, invoke }: KanbanPanelProps) {
 						)
 					})}
 				</KanbanBoard>
-			</CardContent>
-		</Card>
+			</div>
+		</div>
 	)
 }

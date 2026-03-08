@@ -14,3 +14,4 @@ export { ChatMessageRepository } from './repositories/chat-message-repository.js
 export { MemoryBlockRepository } from './repositories/memory-block-repository.js'
 export { TaskRepository } from './repositories/task-repository.js'
 export { CostEntryRepository } from './repositories/cost-entry-repository.js'
+export { ProjectRepository } from './repositories/project-repository.js'

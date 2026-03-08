@@ -54,34 +54,37 @@ export function FileLockPanel({ invoke }: FileLockPanelProps) {
 	}
 
 	return (
-		<Card data-testid="file-locks-panel">
-			<CardHeader>
-				<CardTitle>File Locks</CardTitle>
-				<CardDescription>{data.locks.length} active lock(s)</CardDescription>
-			</CardHeader>
-			<CardContent>
-				{data.locks.length === 0 ? (
-					<div data-testid="no-locks">No active locks</div>
-				) : (
-					<table data-testid="file-locks-table">
-						<thead>
+		<div data-testid="file-locks-panel" className="bg-background mt-8">
+			<div className="mb-4">
+				<h3 className="text-lg font-semibold">File Locks</h3>
+				<p className="text-sm text-muted-foreground">{data.locks.length} active lock(s)</p>
+			</div>
+			{data.locks.length === 0 ? (
+				<div data-testid="no-locks" className="text-sm text-muted-foreground py-4 border rounded-md px-4">
+					No active locks
+				</div>
+			) : (
+				<div className="overflow-auto border rounded-md">
+					<table data-testid="file-locks-table" className="w-full text-sm text-left">
+						<thead className="bg-muted bg-opacity-50">
 							<tr>
-								<th>Path</th>
-								<th>Owner</th>
-								<th>Expires</th>
-								<th>Action</th>
+								<th className="px-4 py-2 font-medium">Path</th>
+								<th className="px-4 py-2 font-medium">Owner</th>
+								<th className="px-4 py-2 font-medium">Expires</th>
+								<th className="px-4 py-2 font-medium">Action</th>
 							</tr>
 						</thead>
-						<tbody>
+						<tbody className="divide-y">
 							{data.locks.map((lock) => (
-								<tr key={lock.path} data-testid={`lock-${lock.path}`}>
-									<td>{lock.path}</td>
-									<td>{lock.ownerId}</td>
-									<td>{new Date(lock.expiresAt as unknown as string).toLocaleTimeString()}</td>
-									<td>
+								<tr key={lock.path} data-testid={`lock-${lock.path}`} className="hover:bg-muted/10">
+									<td className="px-4 py-3">{lock.path}</td>
+									<td className="px-4 py-3">{lock.ownerId}</td>
+									<td className="px-4 py-3 whitespace-nowrap">{new Date(lock.expiresAt as unknown as string).toLocaleTimeString()}</td>
+									<td className="px-4 py-3">
 										<Button
 											data-testid={`release-${lock.path}`}
 											variant="destructive"
+											size="sm"
 											onClick={() => void handleRelease(lock.path, lock.ownerId)}
 										>
 											Release
@@ -91,8 +94,8 @@ export function FileLockPanel({ invoke }: FileLockPanelProps) {
 							))}
 						</tbody>
 					</table>
-				)}
-			</CardContent>
-		</Card>
+				</div>
+			)}
+		</div>
 	)
 }

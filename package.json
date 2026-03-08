@@ -9,6 +9,8 @@
 		"apps/*"
 	],
 	"scripts": {
+		"dev": "bunx concurrently \"bun run --cwd apps/electron dev\" \"bun run --cwd apps/electron electron:dev\"",
+		"start": "bun install && bun run build && bun run dev",
 		"build": "turbo build",
 		"typecheck": "turbo typecheck",
 		"test": "turbo test",

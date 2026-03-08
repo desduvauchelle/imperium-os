@@ -108,16 +108,18 @@ export function PermissionsPanel({ invoke }: PermissionsPanelProps) {
 				)}
 
 				{/* Level Selector */}
-				<div className="flex gap-2" data-testid="level-selector">
+				<div className="flex flex-col gap-4" data-testid="level-selector">
 					{LEVEL_OPTIONS.map((opt) => (
 						<Button
 							key={opt.value}
 							variant={profile?.level === opt.value ? 'default' : 'outline'}
-							size="sm"
+							size="lg"
+							className="h-auto flex-col items-start p-4 text-left"
 							onClick={() => void handleLevelChange(opt.value)}
 							data-testid={`level-${opt.value}`}
 						>
-							{opt.label}
+							<div className="font-semibold">{opt.label}</div>
+							<div className="text-xs text-muted-foreground font-normal mt-1">{opt.description}</div>
 						</Button>
 					))}
 				</div>

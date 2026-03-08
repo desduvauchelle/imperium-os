@@ -24,11 +24,21 @@ curl -fsSL https://bun.sh/install | bash
 
 ---
 
-## Install
+## Quick Start
+
+To install all dependencies, build the workspace, and run the Electron app in development mode, simply run:
 
 ```bash
 git clone https://github.com/your-org/imperium-os.git
 cd imperium-os
+bun run start
+```
+
+---
+
+## Install
+
+```bash
 bun install
 ```
 
@@ -47,9 +57,9 @@ bun run build
 Build a single app:
 
 ```bash
-bun --cwd apps/electron run build    # Electron renderer (Vite)
-bun --cwd apps/web      run build    # Web SPA (Vite)
-bun --cwd apps/mobile   run build    # Mobile web bundle (Vite)
+bun run --cwd apps/electron build    # Electron renderer (Vite)
+bun run --cwd apps/web      build    # Web SPA (Vite)
+bun run --cwd apps/mobile   build    # Mobile web bundle (Vite)
 ```
 
 ---
@@ -58,20 +68,24 @@ bun --cwd apps/mobile   run build    # Mobile web bundle (Vite)
 
 ### Desktop (Electron Master)
 
+The recommended way is to use `bun run start` for the first run, or `bun run dev` for subsequent sessions with Hot Module Replacement (HMR).
+
+Alternatively, you can run the renderer and main process separately:
+
 Open two terminals:
 
 ```bash
 # Terminal 1 — Vite renderer dev server (HMR on http://localhost:5173)
-bun --cwd apps/electron run dev
+bun run --cwd apps/electron dev
 
 # Terminal 2 — Electron main process (loads the renderer)
-bun --cwd apps/electron run electron:dev
+bun run --cwd apps/electron electron:dev
 ```
 
 ### Web Satellite
 
 ```bash
-bun --cwd apps/web run dev          # http://localhost:5174
+bun run --cwd apps/web dev          # http://localhost:5174
 ```
 
 On first load the app shows a **"Connect to Master"** modal. Enter the Master's IP (e.g. `http://192.168.1.x:9100`) and the shared token shown in the Electron **Satellite Settings** panel.
@@ -80,14 +94,14 @@ On first load the app shows a **"Connect to Master"** modal. Enter the Master's 
 
 ```bash
 # Build the web bundle first
-bun --cwd apps/mobile run build
+bun run --cwd apps/mobile build
 
 # Sync to native projects
-bun --cwd apps/mobile run cap:sync
+bun run --cwd apps/mobile cap:sync
 
 # Run on device / simulator
-bun --cwd apps/mobile run cap:run:ios
-bun --cwd apps/mobile run cap:run:android
+bun run --cwd apps/mobile cap:run:ios
+bun run --cwd apps/mobile cap:run:android
 ```
 
 ---
@@ -99,10 +113,10 @@ bun --cwd apps/mobile run cap:run:android
 bun run test
 
 # Single package
-bun --cwd packages/core/notifications bun test
-bun --cwd apps/electron               run test
-bun --cwd apps/web                    run test
-bun --cwd apps/mobile                 run test
+bun run --cwd packages/core/notifications test
+bun run --cwd apps/electron               test
+bun run --cwd apps/web                    test
+bun run --cwd apps/mobile                 test
 ```
 
 ---
@@ -121,7 +135,7 @@ bun run lint        # Biome check across all packages
 Produces a signed/unsigned distributable in `apps/electron/release/`:
 
 ```bash
-bun --cwd apps/electron run electron:build
+bun run --cwd apps/electron electron:build
 ```
 
 | Platform | Output |
@@ -131,6 +145,33 @@ bun --cwd apps/electron run electron:build
 | Linux | `.AppImage` |
 
 > **Code signing:** Set `CSC_LINK` / `CSC_KEY_PASSWORD` (macOS) or `WIN_CSC_LINK` / `WIN_CSC_KEY_PASSWORD` (Windows) environment variables before building. See [electron-builder code signing docs](https://www.electron.build/code-signing).
+
+---
+
+## Distributing the App
+
+Once you have built the application using the packaging command above, you can find the distributables in the `apps/electron/release` folder.
+You can send the `.dmg` (for macOS) or `.exe` (for Windows) to users for installation.
+
+## Installation & Troubleshooting
+
+Because the application might be unsigned by default, users installing the app might encounter OS-level security warnings.
+
+### macOS Gatekeeper Warning
+
+When attempting to open an unsigned `.app` on macOS, it may display a warning that the app is damaged or from an unidentified developer.
+
+**To bypass this:**
+1. Right-click (or Control-click) the application in Finder.
+2. Select **Open**.
+3. In the dialog that appears, click **Open** again.
+
+Alternatively, if Gatekeeper completely blocks it with a "damaged" error, the user can remove the quarantine attribute via terminal:
+
+```bash
+xattr -cr /Applications/Imperium.app
+```
+(Adjust the path if the app is placed elsewhere).
 
 ---
 

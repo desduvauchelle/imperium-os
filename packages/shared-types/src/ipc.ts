@@ -59,11 +59,14 @@ export interface IpcResponse<T = unknown> {
 }
 
 /** Type-safe IPC handler map - maps channels to their request/response types */
+import type { ProjectMetadata } from './project.js'
+
 export interface IpcHandlerMap {
 	'theme:get': { request: void; response: string }
 	'theme:set': { request: { mode: string }; response: void }
 	'theme:changed': { request: { mode: string }; response: void }
-	'project:list': { request: void; response: readonly unknown[] }
+	'project:list': { request: void; response: readonly ProjectMetadata[] }
+	'project:create': { request: { name: string }; response: ProjectMetadata }
 	'project:open': { request: { id: string }; response: void }
 	'project:close': { request: { id: string }; response: void }
 	'agent:start': { request: { projectId: string; task: string }; response: { agentId: string } }

@@ -44,26 +44,26 @@ export function McpStatusPanel({ invoke }: McpStatusPanelProps) {
 	}
 
 	return (
-		<Card data-testid="mcp-status-panel">
-			<CardHeader>
-				<CardTitle>MCP Servers</CardTitle>
-				<CardDescription>{data.servers.length} server(s) registered</CardDescription>
-			</CardHeader>
-			<CardContent>
-				<table data-testid="mcp-servers-table">
-					<thead>
+		<div data-testid="mcp-status-panel" className="bg-background">
+			<div className="mb-4">
+				<h3 className="text-lg font-semibold">MCP Servers</h3>
+				<p className="text-sm text-muted-foreground">{data.servers.length} server(s) registered</p>
+			</div>
+			<div className="overflow-auto border rounded-md">
+				<table data-testid="mcp-servers-table" className="w-full text-sm text-left">
+					<thead className="bg-muted bg-opacity-50">
 						<tr>
-							<th>Name</th>
-							<th>Tools</th>
-							<th>Status</th>
+							<th className="px-4 py-2 font-medium">Name</th>
+							<th className="px-4 py-2 font-medium">Tools</th>
+							<th className="px-4 py-2 font-medium">Status</th>
 						</tr>
 					</thead>
-					<tbody>
+					<tbody className="divide-y">
 						{data.servers.map((s) => (
-							<tr key={s.id} data-testid={`mcp-server-${s.id}`}>
-								<td>{s.name}</td>
-								<td>{s.toolCount}</td>
-								<td>
+							<tr key={s.id} data-testid={`mcp-server-${s.id}`} className="hover:bg-muted/10">
+								<td className="px-4 py-3">{s.name}</td>
+								<td className="px-4 py-3">{s.toolCount}</td>
+								<td className="px-4 py-3">
 									<Badge variant={s.enabled ? 'default' : 'secondary'}>
 										{s.enabled ? 'enabled' : 'disabled'}
 									</Badge>
@@ -72,7 +72,7 @@ export function McpStatusPanel({ invoke }: McpStatusPanelProps) {
 						))}
 					</tbody>
 				</table>
-			</CardContent>
-		</Card>
+			</div>
+		</div>
 	)
 }
