@@ -6,6 +6,7 @@ import { CaffeinateToggle } from '../src/renderer/panels/CaffeinateToggle.js'
 import { KanbanPanel } from '../src/renderer/panels/KanbanPanel.js'
 import { CostingDashboard } from '../src/renderer/panels/CostingDashboard.js'
 import { TailscalePanel } from '../src/renderer/panels/TailscalePanel.js'
+import { SatelliteSettingsPanel } from '../src/renderer/panels/SatelliteSettingsPanel.js'
 import type {
 	PermissionsProfileResponse,
 	SuspensionContext,
@@ -435,6 +436,106 @@ describe('TailscalePanel', () => {
 		fireEvent.click(screen.getByTestId('tailscale-down-btn'))
 		await waitFor(() => {
 			expect(invoke).toHaveBeenCalledWith('tailscale:down', undefined)
+		})
+	})
+})
+
+// ============================================================================
+// SatelliteSettingsPanel tests
+// ============================================================================
+
+const mockSatelliteConfig = {
+	port: 9100,
+	token: 'abcdef0123456789abcdef0123456789',
+	isRunning: true,
+	connectedClients: 2,
+}
+
+describe('SatelliteSettingsPanel', () => {
+	it('shows loading state before invoke resolves', () => {
+		render(<SatelliteSettingsPanel />)
+		expect(screen.getByTestId('satellite-settings-loading')).toBeInTheDocument()
+	})
+
+	it('renders panel after config loads', async () => {
+		const invoke = vi.fn().mockResolvedValue(mockSatelliteConfig)
+		render(<SatelliteSettingsPanel invoke={invoke} />)
+		await waitFor(() => {
+			expect(screen.getByTestId('satellite-settings-panel')).toBeInTheDocument()
+		})
+	})
+
+	it('shows running badge when server is running', async () => {
+		const invoke = vi.fn().mockResolvedValue(mockSatelliteConfig)
+		render(<SatelliteSettingsPanel invoke={invoke} />)
+		await waitFor(() => {
+			expect(screen.getByTestId('satellite-status-badge')).toHaveTextContent('Running')
+		})
+	})
+
+	it('shows stopped badge when server is stopped', async () => {
+		const invoke = vi.fn().mockResolvedValue({ ...mockSatelliteConfig, isRunning: false })
+		render(<SatelliteSettingsPanel invoke={invoke} />)
+		await waitFor(() => {
+			expect(screen.getByTestId('satellite-status-badge')).toHaveTextContent('Stopped')
+		})
+	})
+
+	it('shows correct port', async () => {
+		const invoke = vi.fn().mockResolvedValue(mockSatelliteConfig)
+		render(<SatelliteSettingsPanel invoke={invoke} />)
+		await waitFor(() => {
+			expect(screen.getByTestId('satellite-port')).toHaveTextContent('9100')
+		})
+	})
+
+	it('masks the token to first 8 chars', async () => {
+		const invoke = vi.fn().mockResolvedValue(mockSatelliteConfig)
+		render(<SatelliteSettingsPanel invoke={invoke} />)
+		await waitFor(() => {
+			const masked = screen.getByTestId('satellite-token-masked')
+			expect(masked).toHaveTextContent('abcdef01')
+			expect(masked.textContent).not.toContain('abcdef0123456789abcdef0123456789')
+		})
+	})
+
+	it('shows client count', async () => {
+		const invoke = vi.fn().mockResolvedValue(mockSatelliteConfig)
+		render(<SatelliteSettingsPanel invoke={invoke} />)
+		await waitFor(() => {
+			expect(screen.getByTestId('client-count')).toHaveTextContent('2 clients connected')
+		})
+	})
+
+	it('renders regenerate token button', async () => {
+		const invoke = vi.fn().mockResolvedValue(mockSatelliteConfig)
+		render(<SatelliteSettingsPanel invoke={invoke} />)
+		await waitFor(() => {
+			expect(screen.getByTestId('regenerate-token-btn')).toBeInTheDocument()
+		})
+	})
+
+	it('calls satellite:regenerate-token on button click and shows new token', async () => {
+		const newTokenValue = 'deadbeef' + 'cafebabe' + 'feedface' + '12345678'
+		const invoke = vi.fn()
+			.mockResolvedValueOnce(mockSatelliteConfig)             // get-config
+			.mockResolvedValueOnce({ newToken: newTokenValue })     // regenerate-token
+			.mockResolvedValueOnce(mockSatelliteConfig)             // re-fetch config
+
+		render(<SatelliteSettingsPanel invoke={invoke} />)
+		await waitFor(() => {
+			expect(screen.getByTestId('regenerate-token-btn')).toBeInTheDocument()
+		})
+
+		fireEvent.click(screen.getByTestId('regenerate-token-btn'))
+
+		await waitFor(() => {
+			expect(invoke).toHaveBeenCalledWith('satellite:regenerate-token', undefined)
+		})
+
+		await waitFor(() => {
+			expect(screen.getByTestId('new-token-disclosure')).toBeInTheDocument()
+			expect(screen.getByTestId('new-token-value')).toHaveTextContent(newTokenValue)
 		})
 	})
 })

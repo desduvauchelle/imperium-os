@@ -1,4 +1,4 @@
-import { describe, expect, it, vi, beforeEach } from 'vitest'
+import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { App } from '../src/App.js'
 
@@ -25,7 +25,7 @@ const STORED_CONFIG = JSON.stringify({
 // Setup screen tests (no localStorage config)
 // ============================================================================
 
-describe('Web App — setup screen', () => {
+describe('Mobile App — setup screen', () => {
   beforeEach(() => {
     localStorage.clear()
   })
@@ -61,7 +61,7 @@ describe('Web App — setup screen', () => {
 // Connected shell tests (localStorage config present)
 // ============================================================================
 
-describe('Web App — connected shell', () => {
+describe('Mobile App — connected shell', () => {
   beforeEach(() => {
     localStorage.setItem('imperium:satellite-config', STORED_CONFIG)
   })
@@ -103,4 +103,3 @@ describe('Web App — connected shell', () => {
     expect(screen.getByTestId('nav-settings')).toBeInTheDocument()
   })
 })
-

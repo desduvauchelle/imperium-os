@@ -16,6 +16,8 @@ import type {
 	CostingGetEntriesResponse,
 	TailscaleStatusResponse,
 	TailscaleUpDownResponse,
+	SatelliteConfigResponse,
+	SatelliteRegenerateTokenResponse,
 } from '@imperium/shared-types'
 import { createIpcHandler } from './ipc.js'
 
@@ -149,6 +151,35 @@ export function createPhase5Handlers(deps: Phase5HandlerDeps) {
 
 		createIpcHandler('tailscale:down', async () => {
 			return deps.tailscaleDown()
+		}),
+	] as const
+}
+
+// ============================================================================
+// Phase 6 IPC Handlers — SatelliteServer config management
+// ============================================================================
+
+/**
+ * Dependencies for Phase 6 satellite token management handlers.
+ */
+export interface Phase6HandlerDeps {
+	/** Return the current satellite server configuration (port, masked token). */
+	readonly getSatelliteConfig: () => SatelliteConfigResponse
+	/** Generate a new random token, persist it, and return the new value. */
+	readonly regenerateToken: () => SatelliteRegenerateTokenResponse
+}
+
+/**
+ * Create Phase 6 IPC handlers — satellite config + token regeneration.
+ */
+export function createPhase6Handlers(deps: Phase6HandlerDeps) {
+	return [
+		createIpcHandler('satellite:get-config', async () => {
+			return deps.getSatelliteConfig()
+		}),
+
+		createIpcHandler('satellite:regenerate-token', async () => {
+			return deps.regenerateToken()
 		}),
 	] as const
 }

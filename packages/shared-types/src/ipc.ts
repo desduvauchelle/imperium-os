@@ -38,6 +38,8 @@ export type IpcChannel =
 	| 'tailscale:status'
 	| 'tailscale:up'
 	| 'tailscale:down'
+	| 'satellite:get-config'
+	| 'satellite:regenerate-token'
 
 /** IPC message envelope */
 export interface IpcMessage<T = unknown> {
@@ -92,6 +94,8 @@ export interface IpcHandlerMap {
 	'tailscale:status': { request: void; response: TailscaleStatusResponse }
 	'tailscale:up': { request: void; response: TailscaleUpDownResponse }
 	'tailscale:down': { request: void; response: TailscaleUpDownResponse }
+	'satellite:get-config': { request: void; response: SatelliteConfigResponse }
+	'satellite:regenerate-token': { request: void; response: SatelliteRegenerateTokenResponse }
 }
 
 /** Shape of permissions profile response */
@@ -275,6 +279,49 @@ export interface TailscaleStatusResponse {
 export interface TailscaleUpDownResponse {
 	readonly success: boolean
 	readonly error?: string | undefined
+}
+
+// ============================================================================
+// Satellite API Types (Phase 6)
+// ============================================================================
+
+/** HTTP envelope wrapping every satellite REST response */
+export type SatelliteHttpResponse<T> =
+	| { readonly ok: true; readonly data: T }
+	| { readonly ok: false; readonly error: string }
+
+/** Push events delivered over the satellite WebSocket channel */
+export type SatellitePushEvent =
+	| { readonly type: 'notification:show'; readonly payload: { readonly title: string; readonly message: string } }
+	| { readonly type: 'notification:dismiss'; readonly payload: { readonly id: string } }
+	| { readonly type: 'agent:suspended'; readonly payload: { readonly agentId: string; readonly reason: string } }
+	| { readonly type: 'ping'; readonly payload: Record<string, never> }
+
+/** Configuration for the SatelliteServer (Master side) */
+export interface SatelliteServerConfig {
+	readonly port: number
+	readonly token: string
+	readonly allowedChannels: readonly IpcChannel[]
+}
+
+/** Configuration for the SatelliteClient (browser side) */
+export interface SatelliteClientConfig {
+	readonly baseUrl: string
+	readonly token: string
+}
+
+/** Response for satellite:get-config */
+export interface SatelliteConfigResponse {
+	readonly port: number
+	readonly token: string
+	readonly tailscaleIp?: string | undefined
+	readonly isRunning: boolean
+	readonly connectedClients: number
+}
+
+/** Response for satellite:regenerate-token */
+export interface SatelliteRegenerateTokenResponse {
+	readonly newToken: string
 }
 
 /** Shape of the onboarding check response sent over IPC */

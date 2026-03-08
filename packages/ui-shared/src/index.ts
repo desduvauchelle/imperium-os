@@ -32,5 +32,22 @@ export type { KanbanBoardProps } from './components/kanban-board.js'
 export { SpendBar, formatUsd } from './components/spend-bar.js'
 export type { SpendBarProps } from './components/spend-bar.js'
 
+// Satellite Shell (Phase 6)
+export { SatelliteProvider, useSatellite } from './satellite/SatelliteContext.js'
+export type {
+	InvokeFn,
+	PushCallback,
+	SatelliteContextValue,
+	SatelliteProviderProps,
+} from './satellite/SatelliteContext.js'
+
+export {
+	SatelliteConfigModal,
+	loadSatelliteConfig,
+	saveSatelliteConfig,
+	clearSatelliteConfig,
+} from './satellite/SatelliteConfigModal.js'
+export type { SatelliteConfig, SatelliteConfigModalProps } from './satellite/SatelliteConfigModal.js'
+
 // Utilities
 export { cn } from './lib/utils.js'

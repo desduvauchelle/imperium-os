@@ -151,6 +151,12 @@ export type {
 	CostingGetEntriesResponse,
 	TailscaleStatusResponse,
 	TailscaleUpDownResponse,
+	SatelliteHttpResponse,
+	SatellitePushEvent,
+	SatelliteServerConfig,
+	SatelliteClientConfig,
+	SatelliteConfigResponse,
+	SatelliteRegenerateTokenResponse,
 } from './ipc.js'
 
 // LLM
