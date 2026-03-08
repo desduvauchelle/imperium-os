@@ -15,10 +15,10 @@ import { useSatellite } from '../satellite/SatelliteContext.js'
 import type { SatelliteConfig } from '../satellite/SatelliteConfigModal.js'
 
 export interface MobileShellProps {
-  readonly navItems?: NavItem[]
-  readonly onSettingsSave?: (config: SatelliteConfig) => void
-  readonly extraRoutes?: React.ReactNode
-  readonly defaultRoute?: string
+	readonly navItems?: NavItem[]
+	readonly onSettingsSave?: (config: SatelliteConfig) => void
+	readonly extraRoutes?: React.ReactNode
+	readonly defaultRoute?: string
 }
 
 /**
@@ -26,43 +26,43 @@ export interface MobileShellProps {
  * Wrap in `<BrowserRouter>` before mounting.
  */
 export function MobileShell({
-  navItems,
-  onSettingsSave,
-  extraRoutes,
-  defaultRoute = '/kanban',
+	navItems,
+	onSettingsSave,
+	extraRoutes,
+	defaultRoute = '/kanban',
 }: MobileShellProps) {
-  const { masterOffline } = useSatellite()
+	const { masterOffline } = useSatellite()
 
-  return (
-    <div className="flex flex-col h-screen bg-background text-foreground overflow-hidden" data-testid="mobile-shell">
-      {/* Slim status bar */}
-      <div className="shrink-0 px-4 py-1 border-b border-border flex items-center justify-between">
-        <span className="text-xs font-semibold">Imperium</span>
-        {masterOffline ? (
-          <Badge variant="destructive" data-testid="master-offline-badge">Offline</Badge>
-        ) : (
-          <Badge variant="default" data-testid="master-online-badge">Connected</Badge>
-        )}
-      </div>
-      {/* Content */}
-      <main className="flex-1 overflow-y-auto p-4">
-        <Routes>
-          <Route path="/" element={<Navigate to={defaultRoute} replace />} />
-          <Route path="/kanban" element={<KanbanView />} />
-          <Route path="/costing" element={<CostingView />} />
-          <Route path="/tailscale" element={<TailscaleView />} />
-          <Route path="/mcp" element={<McpView />} />
-          <Route path="/agent" element={<AgentView />} />
-          <Route path="/permissions" element={<PermissionsView />} />
-          <Route
-            path="/settings"
-            element={<SettingsView onSave={onSettingsSave ?? (() => {})} />}
-          />
-          {extraRoutes}
-        </Routes>
-      </main>
-      {/* Bottom navigation */}
-      <BottomNav {...(navItems !== undefined ? { navItems } : {})} />
-    </div>
-  )
+	return (
+		<div className="flex flex-col h-screen bg-background text-foreground overflow-hidden" data-testid="mobile-shell">
+			{/* Slim status bar */}
+			<div className="shrink-0 px-4 py-1 border-b border-border flex items-center justify-between">
+				<span className="text-xs font-semibold">Imperium</span>
+				{masterOffline ? (
+					<Badge variant="destructive" data-testid="master-offline-badge">Offline</Badge>
+				) : (
+					<Badge variant="default" data-testid="master-online-badge">Connected</Badge>
+				)}
+			</div>
+			{/* Content */}
+			<main className="flex-1 overflow-y-auto p-4">
+				<Routes>
+					<Route path="/" element={<Navigate to={defaultRoute} replace />} />
+					<Route path="/kanban" element={<KanbanView />} />
+					<Route path="/costing" element={<CostingView />} />
+					<Route path="/tailscale" element={<TailscaleView />} />
+					<Route path="/mcp" element={<McpView />} />
+					<Route path="/agent" element={<AgentView />} />
+					<Route path="/permissions" element={<PermissionsView />} />
+					<Route
+						path="/settings"
+						element={<SettingsView onSave={onSettingsSave ?? (() => { })} />}
+					/>
+					{extraRoutes}
+				</Routes>
+			</main>
+			{/* Bottom navigation */}
+			<BottomNav {...(navItems !== undefined ? { navItems } : {})} />
+		</div>
+	)
 }

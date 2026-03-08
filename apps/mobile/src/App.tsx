@@ -1,12 +1,12 @@
 import React, { useState } from 'react'
 import { BrowserRouter } from 'react-router-dom'
 import {
-  ThemeProvider,
-  SatelliteProvider,
-  SatelliteConfigModal,
-  MobileShell,
-  loadSatelliteConfig,
-  type SatelliteConfig,
+	ThemeProvider,
+	SatelliteProvider,
+	SatelliteConfigModal,
+	MobileShell,
+	loadSatelliteConfig,
+	type SatelliteConfig,
 } from '@imperium/ui-shared'
 
 import { useSatelliteConnection } from './hooks/useSatelliteConnection.js'
@@ -16,24 +16,24 @@ import { useSatelliteConnection } from './hooks/useSatelliteConnection.js'
 // ============================================================================
 
 function ConnectedShell({
-  config,
-  onReconfigure,
+	config,
+	onReconfigure,
 }: {
-  config: SatelliteConfig
-  onReconfigure: (cfg: SatelliteConfig) => void
+	config: SatelliteConfig
+	onReconfigure: (cfg: SatelliteConfig) => void
 }) {
-  const { invoke, isConnected, masterOffline, onPush } = useSatelliteConnection(config)
+	const { invoke, isConnected, masterOffline, onPush } = useSatelliteConnection(config)
 
-  return (
-    <SatelliteProvider
-      invoke={invoke}
-      isConnected={isConnected}
-      masterOffline={masterOffline}
-      onPush={onPush}
-    >
-      <MobileShell onSettingsSave={onReconfigure} />
-    </SatelliteProvider>
-  )
+	return (
+		<SatelliteProvider
+			invoke={invoke}
+			isConnected={isConnected}
+			masterOffline={masterOffline}
+			onPush={onPush}
+		>
+			<MobileShell onSettingsSave={onReconfigure} />
+		</SatelliteProvider>
+	)
 }
 
 // ============================================================================
@@ -41,20 +41,19 @@ function ConnectedShell({
 // ============================================================================
 
 export function App() {
-  const [config, setConfig] = useState<SatelliteConfig | undefined>(loadSatelliteConfig)
+	const [config, setConfig] = useState<SatelliteConfig | undefined>(loadSatelliteConfig)
 
-  return (
-    <ThemeProvider>
-      {config === undefined || config.masterUrl === '' ? (
-        <div className="min-h-screen bg-background text-foreground" data-testid="setup-screen">
-          <SatelliteConfigModal onSave={setConfig} />
-        </div>
-      ) : (
-        <BrowserRouter>
-          <ConnectedShell config={config} onReconfigure={setConfig} />
-        </BrowserRouter>
-      )}
-    </ThemeProvider>
-  )
+	return (
+		<ThemeProvider>
+			{config === undefined || config.masterUrl === '' ? (
+				<div className="min-h-screen bg-background text-foreground" data-testid="setup-screen">
+					<SatelliteConfigModal onSave={setConfig} />
+				</div>
+			) : (
+				<BrowserRouter>
+					<ConnectedShell config={config} onReconfigure={setConfig} />
+				</BrowserRouter>
+			)}
+		</ThemeProvider>
+	)
 }
-

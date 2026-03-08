@@ -7,18 +7,18 @@ import { App } from '../src/App.js'
 // ============================================================================
 
 vi.mock('@imperium/satellite-client', () => ({
-  createSatelliteClient: () => ({
-    connect: vi.fn(),
-    disconnect: vi.fn(),
-    invoke: vi.fn().mockResolvedValue({}),
-    onPush: vi.fn().mockReturnValue(() => {}),
-    isConnected: false,
-  }),
+	createSatelliteClient: () => ({
+		connect: vi.fn(),
+		disconnect: vi.fn(),
+		invoke: vi.fn().mockResolvedValue({}),
+		onPush: vi.fn().mockReturnValue(() => { }),
+		isConnected: false,
+	}),
 }))
 
 const STORED_CONFIG = JSON.stringify({
-  masterUrl: 'http://localhost:9100',
-  token: 'test-token',
+	masterUrl: 'http://localhost:9100',
+	token: 'test-token',
 })
 
 // ============================================================================
@@ -26,35 +26,35 @@ const STORED_CONFIG = JSON.stringify({
 // ============================================================================
 
 describe('Mobile App — setup screen', () => {
-  beforeEach(() => {
-    localStorage.clear()
-  })
+	beforeEach(() => {
+		localStorage.clear()
+	})
 
-  it('shows setup screen when no config is stored', () => {
-    render(<App />)
-    expect(screen.getByTestId('setup-screen')).toBeInTheDocument()
-  })
+	it('shows setup screen when no config is stored', () => {
+		render(<App />)
+		expect(screen.getByTestId('setup-screen')).toBeInTheDocument()
+	})
 
-  it('shows satellite config modal', () => {
-    render(<App />)
-    expect(screen.getByTestId('satellite-config-modal')).toBeInTheDocument()
-  })
+	it('shows satellite config modal', () => {
+		render(<App />)
+		expect(screen.getByTestId('satellite-config-modal')).toBeInTheDocument()
+	})
 
-  it('shows "Connect to Master" heading in config modal', () => {
-    render(<App />)
-    expect(screen.getByText('Connect to Master')).toBeInTheDocument()
-  })
+	it('shows "Connect to Master" heading in config modal', () => {
+		render(<App />)
+		expect(screen.getByText('Connect to Master')).toBeInTheDocument()
+	})
 
-  it('renders Master URL and token inputs', () => {
-    render(<App />)
-    expect(screen.getByTestId('master-url-input')).toBeInTheDocument()
-    expect(screen.getByTestId('token-input')).toBeInTheDocument()
-  })
+	it('renders Master URL and token inputs', () => {
+		render(<App />)
+		expect(screen.getByTestId('master-url-input')).toBeInTheDocument()
+		expect(screen.getByTestId('token-input')).toBeInTheDocument()
+	})
 
-  it('renders Connect button', () => {
-    render(<App />)
-    expect(screen.getByTestId('config-save-btn')).toBeInTheDocument()
-  })
+	it('renders Connect button', () => {
+		render(<App />)
+		expect(screen.getByTestId('config-save-btn')).toBeInTheDocument()
+	})
 })
 
 // ============================================================================
@@ -62,38 +62,37 @@ describe('Mobile App — setup screen', () => {
 // ============================================================================
 
 describe('Mobile App — connected shell', () => {
-  beforeEach(() => {
-    localStorage.setItem('imperium:satellite-config', STORED_CONFIG)
-  })
+	beforeEach(() => {
+		localStorage.setItem('imperium:satellite-config', STORED_CONFIG)
+	})
 
-  afterEach(() => {
-    localStorage.clear()
-  })
+	afterEach(() => {
+		localStorage.clear()
+	})
 
-  it('shows mobile shell when config is stored', () => {
-    render(<App />)
-    expect(screen.getByTestId('mobile-shell')).toBeInTheDocument()
-  })
+	it('shows mobile shell when config is stored', () => {
+		render(<App />)
+		expect(screen.getByTestId('mobile-shell')).toBeInTheDocument()
+	})
 
-  it('renders the bottom navigation', () => {
-    render(<App />)
-    expect(screen.getByTestId('bottom-nav')).toBeInTheDocument()
-  })
+	it('renders the bottom navigation', () => {
+		render(<App />)
+		expect(screen.getByTestId('bottom-nav')).toBeInTheDocument()
+	})
 
-  it('bottom nav shows Master Offline badge when not connected', () => {
-    render(<App />)
-    expect(screen.getByTestId('master-offline-badge')).toBeInTheDocument()
-  })
+	it('bottom nav shows Master Offline badge when not connected', () => {
+		render(<App />)
+		expect(screen.getByTestId('master-offline-badge')).toBeInTheDocument()
+	})
 
-  it('renders nav items in bottom nav', () => {
-    render(<App />)
-    expect(screen.getByTestId('nav-kanban')).toBeInTheDocument()
-    expect(screen.getByTestId('nav-costing')).toBeInTheDocument()
-    expect(screen.getByTestId('nav-tailscale')).toBeInTheDocument()
-    expect(screen.getByTestId('nav-mcp')).toBeInTheDocument()
-    expect(screen.getByTestId('nav-agent')).toBeInTheDocument()
-    expect(screen.getByTestId('nav-permissions')).toBeInTheDocument()
-    expect(screen.getByTestId('nav-settings')).toBeInTheDocument()
-  })
+	it('renders nav items in bottom nav', () => {
+		render(<App />)
+		expect(screen.getByTestId('nav-kanban')).toBeInTheDocument()
+		expect(screen.getByTestId('nav-costing')).toBeInTheDocument()
+		expect(screen.getByTestId('nav-tailscale')).toBeInTheDocument()
+		expect(screen.getByTestId('nav-mcp')).toBeInTheDocument()
+		expect(screen.getByTestId('nav-agent')).toBeInTheDocument()
+		expect(screen.getByTestId('nav-permissions')).toBeInTheDocument()
+		expect(screen.getByTestId('nav-settings')).toBeInTheDocument()
+	})
 })
-
