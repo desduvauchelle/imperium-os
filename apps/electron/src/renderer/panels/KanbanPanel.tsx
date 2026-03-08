@@ -59,36 +59,37 @@ export function KanbanPanel({ projectId, invoke }: KanbanPanelProps) {
 	}
 
 	return (
-		<div data-testid="kanban-panel" className="h-[calc(100vh-8rem)] flex flex-col">
-			<div className="mb-4">
+		<div
+			data-testid="kanban-panel"
+			className="w-full h-full overflow-auto p-8"
+		>
+			<div className="mb-6">
 				<p className="text-sm text-muted-foreground">{board.taskCount} task(s)</p>
 			</div>
-			<div className="flex-1 overflow-hidden">
-				<KanbanBoard>
-					{COLUMNS.map((status) => {
-						const tasks = board.columns[status] ?? []
-						return (
-							<KanbanColumn
-								key={status}
-								status={status}
-								label={getColumnLabel(status)}
-								count={tasks.length}
-							>
-								{tasks.map((task) => (
-									<KanbanCard
-										key={task.id}
-										id={task.id}
-										title={task.title}
-										priority={task.priority}
-										assignee={task.assignee}
-										commentCount={task.commentCount}
-									/>
-								))}
-							</KanbanColumn>
-						)
-					})}
-				</KanbanBoard>
-			</div>
+			<KanbanBoard>
+				{COLUMNS.map((status) => {
+					const tasks = board.columns[status] ?? []
+					return (
+						<KanbanColumn
+							key={status}
+							status={status}
+							label={getColumnLabel(status)}
+							count={tasks.length}
+						>
+							{tasks.map((task) => (
+								<KanbanCard
+									key={task.id}
+									id={task.id}
+									title={task.title}
+									priority={task.priority}
+									assignee={task.assignee}
+									commentCount={task.commentCount}
+								/>
+							))}
+						</KanbanColumn>
+					)
+				})}
+			</KanbanBoard>
 		</div>
 	)
 }

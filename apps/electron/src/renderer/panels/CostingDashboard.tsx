@@ -59,7 +59,7 @@ export function CostingDashboard({ budgetLimit = 10, invoke }: CostingDashboardP
 	const modelEntries = Object.values(summary.entriesByModel)
 
 	return (
-		<div data-testid="costing-dashboard" className="h-[calc(100vh-8rem)] flex flex-col space-y-6">
+		<div data-testid="costing-dashboard" className="w-full h-full overflow-auto p-8 space-y-6">
 			<div>
 				<p className="text-sm text-muted-foreground mb-4">
 					{summary.totalInputTokens + summary.totalOutputTokens} total tokens

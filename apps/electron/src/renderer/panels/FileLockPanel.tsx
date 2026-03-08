@@ -55,10 +55,6 @@ export function FileLockPanel({ invoke }: FileLockPanelProps) {
 
 	return (
 		<div data-testid="file-locks-panel" className="bg-background mt-8">
-			<div className="mb-4">
-				<h3 className="text-lg font-semibold">File Locks</h3>
-				<p className="text-sm text-muted-foreground">{data.locks.length} active lock(s)</p>
-			</div>
 			{data.locks.length === 0 ? (
 				<div data-testid="no-locks" className="text-sm text-muted-foreground py-4 border rounded-md px-4">
 					No active locks

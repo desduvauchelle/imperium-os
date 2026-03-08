@@ -45,10 +45,6 @@ export function McpStatusPanel({ invoke }: McpStatusPanelProps) {
 
 	return (
 		<div data-testid="mcp-status-panel" className="bg-background">
-			<div className="mb-4">
-				<h3 className="text-lg font-semibold">MCP Servers</h3>
-				<p className="text-sm text-muted-foreground">{data.servers.length} server(s) registered</p>
-			</div>
 			<div className="overflow-auto border rounded-md">
 				<table data-testid="mcp-servers-table" className="w-full text-sm text-left">
 					<thead className="bg-muted bg-opacity-50">

@@ -160,8 +160,8 @@ export function App() {
 									</div>
 								)}
 
-								<div className="flex-1 overflow-y-auto p-8">
-									<div className="max-w-4xl mx-auto space-y-6">
+								<div className="flex-1 h-full w-full overflow-hidden">
+									<div className={activeProject ? 'h-full w-full' : 'max-w-4xl mx-auto p-8 space-y-6'}>
 										{currentView === 'overview' && (
 											<>
 												<Card>
@@ -189,10 +189,10 @@ export function App() {
 										)}
 										{activeProject && currentView === 'pr-costing' && <CostingDashboard invoke={window.electronApi.invoke} />}
 										{activeProject && currentView === 'pr-mcp' && (
-											<>
+											<div className="w-full h-full overflow-auto p-8 space-y-8">
 												<McpStatusPanel />
 												<FileLockPanel />
-											</>
+											</div>
 										)}
 
 
