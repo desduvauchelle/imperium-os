@@ -1,76 +1,196 @@
 # Imperium OS
 
-**Imperium** is a multi-platform, agentic operating system built using a monorepo architecture. It is designed to operate across desktop (primary macOS-focused master node), web, and mobile platforms (satellites) with a headless core and shared UI components. Bun is the primary runtime, package manager, and test runner.
+**Imperium** is a multi-platform, agentic operating system built as a Turborepo monorepo. The **Master** node runs on macOS as an Electron desktop app and exposes a REST + WebSocket gateway (the **Satellite Server**) on port `9100`. **Satellite** clients — a Vite SPA and a Capacitor mobile app — connect to the Master over the local network or via Tailscale.
+
+[![CI](https://github.com/your-org/imperium-os/actions/workflows/ci.yml/badge.svg)](https://github.com/your-org/imperium-os/actions/workflows/ci.yml)
+[![Release](https://github.com/your-org/imperium-os/actions/workflows/release.yml/badge.svg)](https://github.com/your-org/imperium-os/actions/workflows/release.yml)
 
 ---
 
-## 🚀 High-Level Goals
+## Prerequisites
 
-- **Agentic Brain**: A modular core that handles reasoning, tool-calling, and chaining logic.
-- **Context Awareness**: Assembles context via RAG (retrieval-augmented generation), file tree analysis, and summarization.
-- **Cross-Platform UI**: Shared component library for Electron, Web, and future mobile interfaces.
-- **Safe Command Execution**: Profiles (Mad Max, Praetorian, Imperator) govern tool usage and guardrails.
-- **Hierarchical Memory**: Token-optimized memory snapshots, sliding windows, and local SQL archives.
-- **Robust Onboarding**: Auto-detects/installs CLI dependencies and handles authentication flows.
-- **macOS Integration**: Power management, non-blocking suspensions, and system persistence.
-- **Secure Multi-User Sync**: Tailscale-based P2P collaboration with offline detection.
+| Tool | Version | Purpose |
+|------|---------|---------|
+| [Bun](https://bun.sh) | ≥ 1.2.0 | Runtime, package manager, test runner |
+| [Node.js](https://nodejs.org) | ≥ 20.0.0 | Required by Electron and some build tools |
+| [Xcode](https://developer.apple.com/xcode/) | latest | macOS/iOS builds (macOS only) |
+| [Android Studio](https://developer.android.com/studio) | latest | Android builds (optional) |
 
----
+Install Bun if you don't have it:
 
-## 🛠 Monorepo Structure
-
-```
-/imperium-root
-├── /packages
-│   ├── /core               # The "Brain" (Framework Agnostic, Bun-native)
-│   │   ├── /engine         # Reasoning, Tool-Calling, Chaining logic
-│   │   ├── /context        # Context Assembly (RAG + File Tree + Summarization)
-│   │   ├── /notifications  # WebSocket Server (Master-to-Satellite)
-│   │   ├── /onboarding     # CLI Dependency & Auth Checkers
-│   │   ├── /permissions    # Guardrail & Whitelist logic for MCPs
-│   │   ├── /os-power       # macOS Power Management (Caffeinate/Sleep prevention)
-│   │   └── /costing        # Usage tracking & pricing engine
-│   ├── /mcp-internal       # Native MCP Servers
-│   │   ├── /media          # Image Gen (DALL-E, Imagen, Local SD)
-│   │   ├── /comm           # Discord, Telegram, WhatsApp, Email
-│   │   └── /fs             # MCP-compliant File System operations (with Locking)
-│   ├── /ui-shared          # shadcn/ui components + Tailwind (Themed)
-│   └── /shared-types       # Source of Truth for TS Interfaces
-├── /apps
-│   ├── /electron           # Main process & Desktop-specific IPC
-│   ├── /web                # Next.js/Vite (Planned Satellite Interface)
-│   └── /mobile             # Capacitor wrapper (Planned Satellite Interface)
-└── /projects               # Local-first storage (JSON/Markdown)
+```bash
+curl -fsSL https://bun.sh/install | bash
 ```
 
 ---
 
-## 🔄 Development Roadmap
+## Install
 
-1. **Phase 1: Foundation.** Monorepo setup with Bun, shared theme, and strict TS interfaces.
-2. **Phase 2: Core & Context.** Context Assembly Layer, CLI Onboarding, and hierarchical Memory Snapshotting.
-3. **Phase 3: Permissions & OS Logic.** Implement profile guardrails, macOS sleep prevention, and suspension logic.
-4. **Phase 4: Internal MCPs.** MCP-FS with locking and MCP-Comm for social integrations.
-5. **Phase 5: Networking & Desktop UI.** Tailscale P2P, interactive Kanban, and the Costing Dashboard.
-6. **Phase 6: Satellite Expansion.** Web/Mobile interfaces connecting to the Master Desktop.
+```bash
+git clone https://github.com/your-org/imperium-os.git
+cd imperium-os
+bun install
+```
 
----
-
-## 📦 Getting Started
-
-1. Ensure [Bun](https://bun.sh) is installed and on your PATH.
-2. Clone the repository and run `bun install` at the root.
-3. Use `bun run` in package directories or the root with Turborepo commands (`turbo run dev`, `turbo run test`, etc.).
+This installs all workspace dependencies in one pass via Bun's workspace resolver.
 
 ---
 
-## 📝 Notes
+## Build
 
-- The project is tailored for macOS-first development but architectures for cross-platform support.
-- Configuration and build scripts rely on Bun; adapt if switching runtime.
+Build every package and app (respects Turborepo dependency order):
+
+```bash
+bun run build
+```
+
+Build a single app:
+
+```bash
+bun --cwd apps/electron run build    # Electron renderer (Vite)
+bun --cwd apps/web      run build    # Web SPA (Vite)
+bun --cwd apps/mobile   run build    # Mobile web bundle (Vite)
+```
 
 ---
 
-## 📄 License
+## Run — Development
 
-Specify license information here (e.g., MIT).
+### Desktop (Electron Master)
+
+Open two terminals:
+
+```bash
+# Terminal 1 — Vite renderer dev server (HMR on http://localhost:5173)
+bun --cwd apps/electron run dev
+
+# Terminal 2 — Electron main process (loads the renderer)
+bun --cwd apps/electron run electron:dev
+```
+
+### Web Satellite
+
+```bash
+bun --cwd apps/web run dev          # http://localhost:5174
+```
+
+On first load the app shows a **"Connect to Master"** modal. Enter the Master's IP (e.g. `http://192.168.1.x:9100`) and the shared token shown in the Electron **Satellite Settings** panel.
+
+### Mobile Satellite (Capacitor)
+
+```bash
+# Build the web bundle first
+bun --cwd apps/mobile run build
+
+# Sync to native projects
+bun --cwd apps/mobile run cap:sync
+
+# Run on device / simulator
+bun --cwd apps/mobile run cap:run:ios
+bun --cwd apps/mobile run cap:run:android
+```
+
+---
+
+## Test
+
+```bash
+# All packages and apps (parallel, via Turborepo)
+bun run test
+
+# Single package
+bun --cwd packages/core/notifications bun test
+bun --cwd apps/electron               run test
+bun --cwd apps/web                    run test
+bun --cwd apps/mobile                 run test
+```
+
+---
+
+## Typecheck & Lint
+
+```bash
+bun run typecheck   # tsc --noEmit across all packages
+bun run lint        # Biome check across all packages
+```
+
+---
+
+## Package (Desktop Release Build)
+
+Produces a signed/unsigned distributable in `apps/electron/release/`:
+
+```bash
+bun --cwd apps/electron run electron:build
+```
+
+| Platform | Output |
+|----------|--------|
+| macOS | `.dmg` (installer) + `.zip` (auto-update) |
+| Windows | `.exe` NSIS installer |
+| Linux | `.AppImage` |
+
+> **Code signing:** Set `CSC_LINK` / `CSC_KEY_PASSWORD` (macOS) or `WIN_CSC_LINK` / `WIN_CSC_KEY_PASSWORD` (Windows) environment variables before building. See [electron-builder code signing docs](https://www.electron.build/code-signing).
+
+---
+
+## Monorepo Structure
+
+```
+/imperium-os
+├── apps/
+│   ├── electron/          # Master — Electron desktop app + SatelliteServer
+│   ├── web/               # Satellite — Vite SPA (port 5174)
+│   └── mobile/            # Satellite — Capacitor iOS/Android wrapper
+├── packages/
+│   ├── core/
+│   │   ├── engine/        # Reasoning, tool-calling, agent state machine
+│   │   ├── context/       # RAG + file tree + memory snapshots
+│   │   ├── notifications/ # SatelliteServer (REST + WebSocket, port 9100)
+│   │   ├── onboarding/    # CLI dependency & auth checkers
+│   │   ├── permissions/   # Mad Max / Praetorian / Imperator profiles
+│   │   ├── os-power/      # macOS caffeinate / sleep prevention
+│   │   ├── costing/       # Usage tracking & pricing engine
+│   │   ├── tailscale/     # Tailscale CLI bridge
+│   │   └── satellite-client/ # Browser-safe SatelliteClient (fetch + WS)
+│   ├── mcp-internal/
+│   │   ├── media/         # Image generation (DALL-E, Imagen, Stable Diffusion)
+│   │   ├── comm/          # Discord, Telegram, WhatsApp, Email
+│   │   └── fs/            # MCP-compliant file system with locking
+│   ├── ui-shared/         # shadcn/ui components + Tailwind + SatelliteProvider
+│   └── shared-types/      # Single source of truth for all TypeScript interfaces
+└── projects/              # Local-first storage (JSON / Markdown)
+```
+
+---
+
+## Satellite Server
+
+The Master exposes an HTTP + WebSocket gateway at `http://<master-ip>:9100`:
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/health` | `GET` | Liveness probe — returns `{ ok: true, version, uptime }` |
+| `/api/:channel` | `POST` | Invoke any allowed IPC channel; body `{ payload }`, header `x-imperium-token` |
+| `/ws?token=<token>` | `WS` | Push channel — receives `SatellitePushEvent` broadcasts |
+
+Token management lives in **Electron → Satellite Settings panel**: view the current token, rotate it at any time.
+
+---
+
+## Development Roadmap
+
+| Phase | Status | Description |
+|-------|--------|-------------|
+| 1 | ✅ | Foundation — monorepo, shared theme, strict TypeScript |
+| 2 | ✅ | Core & Context — context assembly, CLI onboarding, memory snapshots |
+| 3 | ✅ | Permissions & OS Logic — guardrail profiles, macOS sleep prevention, suspension |
+| 4 | ✅ | Internal MCPs — MCP-FS locking, MCP-Comm social integrations |
+| 5 | ✅ | Networking & Desktop UI — Tailscale, Kanban, Costing Dashboard |
+| 6 | ✅ | Satellite Expansion — Web/Mobile clients, REST + WebSocket gateway |
+
+---
+
+## License
+
+MIT
